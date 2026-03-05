@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}StreamFlix - Premium Streaming{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo.png') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <a href="{{ url_for('home') }}" class="navbar-brand">
+            <span class="navbar-brand-text">StreamFlix</span>
+        </a>
+        
+        <ul class="navbar-nav">
+            <li><a href="{{ url_for('home') }}" class="{% if request.endpoint == 'home' %}active{% endif %}">Home</a></li>
+            <li><a href="{{ url_for('movies') }}" class="{% if request.endpoint == 'movies' %}active{% endif %}">Movies</a></li>
+            <li><a href="{{ url_for('tvshows') }}" class="{% if request.endpoint == 'tvshows' %}active{% endif %}">TV Shows</a></li>
+            <li><a href="{{ url_for('anime') }}" class="{% if request.endpoint == 'anime' %}active{% endif %}">Anime</a></li>
+            <li><a href="{{ url_for('categories') }}" class="{% if request.endpoint == 'categories' %}active{% endif %}">Categories</a></li>
+        </ul>
+        
+        <div class="navbar-actions">
+            <div class="search-container" id="searchContainer">
+                <button class="search-icon-btn" onclick="toggleSearch()">
+                    <i class="fas fa-search"></i>
+                </button>
+                <input type="text" class="search-input" placeholder="Search..." id="searchInput" onkeyup="handleSearch(event)">
+            </div>
+            <div class="user-avatar">U</div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    {% block content %}{% endblock %}
+
+    <!-- Video Player Modal -->
+    <div class="modal-overlay" id="videoModal">
+        <button class="modal-close" onclick="closeVideoModal()">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="modal-content">
+            <div class="modal-video-container">
+                <iframe id="videoPlayer" src="" allowfullscreen></iframe>
+            </div>
+            <div class="modal-body">
+                <div class="modal-header">
+                    <img src="" alt="" class="modal-poster" id="modalPoster">
+                    <div class="modal-info">
+                        <h2 class="modal-title" id="modalTitle"></h2>
+                        <div class="modal-meta">
+                            <span class="modal-rating" id="modalRating"></span>
+                            <span id="modalYear"></span>
+                            <span id="modalRuntime"></span>
+                        </div>
+                        <div class="modal-genres" id="modalGenres"></div>
+                        <p class="modal-description" id="modalDescription"></p>
+                    </div>
+                </div>
+                <div class="modal-server-select">
+                    <label for="serverSelect"><i class="fas fa-server"></i> Server:</label>
+                    <select id="serverSelect" onchange="changeServer()">
+                        <option value="vidsrc.cc">Vidsrc.cc (Primary)</option>
+                        <option value="vidsrc.me">Vidsrc.me</option>
+                        <option value="player.videasy.net">Player.Videasy.net</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Modal -->
+    <div class="search-modal" id="searchModal">
+        <input type="text" class="search-modal-input" placeholder="Search for movies, TV shows, anime..." 
+               id="searchModalInput" oninput="performSearch()">
+        <div class="search-modal-results" id="searchResults"></div>
+        <button class="modal-close" onclick="closeSearchModal()">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h4>Browse</h4>
+                    <ul class="footer-links">
+                        <li><a href="{{ url_for('movies') }}">Movies</a></li>
+                        <li><a href="{{ url_for('tvshows') }}">TV Shows</a></li>
+                        <li><a href="{{ url_for('anime') }}">Anime</a></li>
+                        <li><a href="{{ url_for('categories') }}">Categories</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Support</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Cookie Policy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Connect</h4>
+                    <div class="footer-social">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="footer-copyright">&copy; 2025 StreamFlix. All rights reserved.</p>
+                <div class="footer-legal">
+                    <a href="#">Disclaimer</a>
+                    <a href="#">About Us</a>
+                    <a href="#">DMCA</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Global variables
+        const API_KEY = '{{ api_key }}';
+        const IMG_URL = '{{ img_url }}';
+        let currentItem = null;
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Search functions
+        function toggleSearch() {
+            const container = document.getElementById('searchContainer');
+            container.classList.toggle('active');
+            if (container.classList.contains('active')) {
+                document.getElementById('searchInput').focus();
+            }
+        }
+
+        function handleSearch(event) {
+            if (event.key === 'Enter') {
+                const query = document.getElementById('searchInput').value;
+                if (query.trim()) {
+                    openSearchModal(query);
+                }
+            }
+        }
+
+        function openSearchModal(query = '') {
+            const modal = document.getElementById('searchModal');
+            const input = document.getElementById('searchModalInput');
+            modal.classList.add('active');
+            input.value = query;
+            input.focus();
+            if (query) {
+                performSearch();
+            }
+        }
+
+        function closeSearchModal() {
+            document.getElementById('searchModal').classList.remove('active');
+            document.getElementById('searchResults').innerHTML = '';
+        }
+
+        async function performSearch() {
+            const query = document.getElementById('searchModalInput').value;
+            if (!query.trim()) {
+                document.getElementById('searchResults').innerHTML = '';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/search?query=${encodeURIComponent(query)}`);
+                const data = await response.json();
+                displaySearchResults(data.results);
+            } catch (error) {
+                console.error('Search error:', error);
+            }
+        }
+
+        function displaySearchResults(results) {
+            const container = document.getElementById('searchResults');
+            container.innerHTML = '';
+            
+            const filteredResults = results.filter(item => 
+                item.poster_path && (item.media_type === 'movie' || item.media_type === 'tv')
+            );
+
+            filteredResults.slice(0, 20).forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'search-result-item';
+                div.innerHTML = `
+                    <img src="${IMG_URL}${item.poster_path}" alt="${item.title || item.name}">
+                    <p class="search-result-title">${item.title || item.name}</p>
+                `;
+                div.onclick = () => {
+                    closeSearchModal();
+                    openVideoModal(item);
+                };
+                container.appendChild(div);
+            });
+        }
+
+        // Video Modal functions
+        function openVideoModal(item) {
+            currentItem = item;
+            const modal = document.getElementById('videoModal');
+            
+            document.getElementById('modalTitle').textContent = item.title || item.name;
+            document.getElementById('modalPoster').src = item.poster_path ? `${IMG_URL}${item.poster_path}` : '';
+            document.getElementById('modalDescription').textContent = item.overview || 'No description available.';
+            document.getElementById('modalRating').textContent = `★ ${item.vote_average?.toFixed(1) || 'N/A'}`;
+            document.getElementById('modalYear').textContent = item.release_date || item.first_air_date?.substring(0, 4) || '';
+            
+            // Generate genres
+            const genresContainer = document.getElementById('modalGenres');
+            genresContainer.innerHTML = '';
+            
+            changeServer();
+            modal.classList.add('active');
+            
+            // Prevent body scroll
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeVideoModal() {
+            const modal = document.getElementById('videoModal');
+            modal.classList.remove('active');
+            document.getElementById('videoPlayer').src = '';
+            document.body.style.overflow = '';
+        }
+
+        function changeServer() {
+            if (!currentItem) return;
+            
+            const server = document.getElementById('serverSelect').value;
+            const type = currentItem.media_type === 'movie' ? 'movie' : 'tv';
+            let embedURL = '';
+
+            if (server === 'vidsrc.cc') {
+                embedURL = `https://vidsrc.cc/v2/embed/${type}/${currentItem.id}`;
+            } else if (server === 'vidsrc.me') {
+                embedURL = `https://vidsrc.net/embed/${type}/?tmdb=${currentItem.id}`;
+            } else if (server === 'player.videasy.net') {
+                embedURL = `https://player.videasy.net/${type}/${currentItem.id}`;
+            }
+
+            document.getElementById('videoPlayer').src = embedURL;
+        }
+
+        // Close modals on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeVideoModal();
+                closeSearchModal();
+            }
+        });
+
+        // Close modals on overlay click
+        document.getElementById('videoModal').addEventListener('click', (e) => {
+            if (e.target.id === 'videoModal') {
+                closeVideoModal();
+            }
+        });
+
+        // Slider navigation
+        function scrollSlider(direction, containerId) {
+            const container = document.getElementById(containerId);
+            const scrollAmount = container.clientWidth * 0.8;
+            container.scrollBy({
+                left: direction === 'left' ? -scrollAmount : scrollAmount,
+                behavior: 'smooth'
+            });
+        }
+
+        // Utility function to format numbers
+        function formatNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            }
+            return num;
+        }
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
