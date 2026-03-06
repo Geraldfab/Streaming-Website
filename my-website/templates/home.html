@@ -3,27 +3,21 @@
 {% block title %}StreamFlix - Watch Movies & TV Shows Online{% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
-<section class="hero" id="hero">
-    <div class="hero-content">
-        <h1 class="hero-title" id="heroTitle">Loading...</h1>
-        <div class="hero-meta">
-            <span class="hero-rating" id="heroRating"></span>
-            <span class="hero-year" id="heroYear"></span>
-            <span class="hero-duration"></span>
-            <span class="hero-quality">HD</span>
-        </div>
-        <p class="hero-description" id="heroDescription"></p>
-        <div class="hero-buttons">
-            <button class="btn btn-primary" onclick="playHeroContent()">
-                <i class="fas fa-play"></i> Play
-            </button>
-            <button class="btn btn-secondary" onclick="showHeroDetails()">
-                <i class="fas fa-info-circle"></i> More Info
-            </button>
-        </div>
+<!-- Hero Slider Section -->
+<div class="hero-slider" id="heroSlider">
+    <div class="hero-slides" id="heroSlides">
+        <!-- Slides will be loaded dynamically -->
     </div>
-</section>
+    <button class="hero-arrow left" onclick="changeSlide(-1)">
+        <i class="fas fa-chevron-left"></i>
+    </button>
+    <button class="hero-arrow right" onclick="changeSlide(1)">
+        <i class="fas fa-chevron-right"></i>
+    </button>
+    <div class="hero-nav" id="heroNav">
+        <!-- Dots will be generated dynamically -->
+    </div>
+</div>
 
 <!-- Content Sections -->
 <div class="content-section">
@@ -150,8 +144,13 @@
 
 {% block extra_js %}
 <script>
+    let currentSlide = 0;
+    let heroItems = [];
+    let heroAutoSlideInterval;
+
     // Load all content on page load
     document.addEventListener('DOMContentLoaded', async () => {
+        await loadHeroContent();
         await Promise.all([
             loadTrendingMovies(),
             loadPopularMovies(),
@@ -161,7 +160,130 @@
             loadTopRatedMovies(),
             loadNowPlaying()
         ]);
+        // Start auto-slide after content loads
+        startHeroAutoSlide();
     });
+
+    // Fetch hero content (trending movies and TV shows)
+    async function loadHeroContent() {
+        try {
+            const [moviesRes, tvRes] = await Promise.all([
+                fetch('/api/trending/movie'),
+                fetch('/api/trending/tv')
+            ]);
+            
+            const moviesData = await moviesRes.json();
+            const tvData = await tvRes.json();
+            
+            // Combine and shuffle for variety
+            heroItems = [...moviesData.results, ...tvData.results]
+                .filter(item => item.backdrop_path)
+                .sort(() => Math.random() - 0.5)
+                .slice(0, 5);
+            
+            displayHeroSlides();
+        } catch (error) {
+            console.error('Error loading hero content:', error);
+        }
+    }
+
+    // Display hero slides
+    function displayHeroSlides() {
+        const slidesContainer = document.getElementById('heroSlides');
+        const navContainer = document.getElementById('heroNav');
+        
+        slidesContainer.innerHTML = '';
+        navContainer.innerHTML = '';
+        
+        heroItems.forEach((item, index) => {
+            // Create slide
+            const slide = document.createElement('div');
+            slide.className = 'hero-slide';
+            slide.style.backgroundImage = `url(${IMG_URL}${item.backdrop_path})`;
+            slide.innerHTML = `
+                <div class="hero-content">
+                    <h1 class="hero-title">${item.title || item.name}</h1>
+                    <div class="hero-meta">
+                        <span class="hero-rating">★ ${item.vote_average?.toFixed(1) || 'N/A'}</span>
+                        <span class="hero-year">${(item.release_date || item.first_air_date || '').substring(0, 4)}</span>
+                        <span class="hero-quality">HD</span>
+                    </div>
+                    <p class="hero-description">${item.overview || ''}</p>
+                    <div class="hero-buttons">
+                        <button class="btn btn-primary" onclick="playHeroContent(${index})">
+                            <i class="fas fa-play"></i> Play
+                        </button>
+                        <button class="btn btn-secondary" onclick="showHeroDetails(${index})">
+                            <i class="fas fa-info-circle"></i> More Info
+                        </button>
+                    </div>
+                </div>
+            `;
+            slidesContainer.appendChild(slide);
+            
+            // Create dot
+            const dot = document.createElement('button');
+            dot.className = `hero-dot ${index === 0 ? 'active' : ''}`;
+            dot.onclick = () => goToSlide(index);
+            navContainer.appendChild(dot);
+        });
+    }
+
+    // Change slide
+    function changeSlide(direction) {
+        currentSlide = (currentSlide + direction + heroItems.length) % heroItems.length;
+        updateHeroSlide();
+    }
+
+    // Go to specific slide
+    function goToSlide(index) {
+        currentSlide = index;
+        updateHeroSlide();
+    }
+
+    // Update hero slide display
+    function updateHeroSlide() {
+        const slidesContainer = document.getElementById('heroSlides');
+        slidesContainer.style.transform = `translateX(-${currentSlide * 100}%)`;
+        
+        // Update dots
+        document.querySelectorAll('.hero-dot').forEach((dot, index) => {
+            dot.classList.toggle('active', index === currentSlide);
+        });
+    }
+
+    // Start auto-slide
+    function startHeroAutoSlide() {
+        heroAutoSlideInterval = setInterval(() => {
+            changeSlide(1);
+        }, 5000);
+    }
+
+    // Stop auto-slide on user interaction
+    document.getElementById('heroSlider').addEventListener('mouseenter', () => {
+        clearInterval(heroAutoSlideInterval);
+    });
+
+    document.getElementById('heroSlider').addEventListener('mouseleave', () => {
+        startHeroAutoSlide();
+    });
+
+    // Play hero content
+    function playHeroContent(index) {
+        const item = heroItems[index];
+        if (item) {
+            const type = item.media_type || 'movie';
+            playContent(type, item.id);
+        }
+    }
+
+    // Show hero details
+    function showHeroDetails(index) {
+        const item = heroItems[index];
+        if (item) {
+            openVideoModal(item);
+        }
+    }
 
     // Fetch and display trending movies
     async function loadTrendingMovies() {
@@ -281,20 +403,9 @@
                         <span>${item.release_date ? item.release_date.substring(0, 4) : item.first_air_date ? item.first_air_date.substring(0, 4) : ''}</span>
                     </div>
                 </div>
-                <div class="card-details">
-                    <h4 class="card-details-title">${item.title || item.name}</h4>
-                    <div class="card-details-buttons">
-                        <button class="card-details-btn play" onclick="event.stopPropagation(); playContent('${type}', ${item.id})">
-                            <i class="fas fa-play"></i> Play
-                        </button>
-                        <button class="card-details-btn info" onclick="event.stopPropagation(); openVideoModal(item)">
-                            <i class="fas fa-info-circle"></i> Info
-                        </button>
-                    </div>
-                </div>
             `;
             
-            // Make item accessible for modal
+            // Click to open modal
             card.onclick = () => {
                 item.media_type = type;
                 openVideoModal(item);
