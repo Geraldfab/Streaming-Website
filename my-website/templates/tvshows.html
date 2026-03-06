@@ -181,17 +181,6 @@
                         <span>${item.first_air_date ? item.first_air_date.substring(0, 4) : ''}</span>
                     </div>
                 </div>
-                <div class="card-details">
-                    <h4 class="card-details-title">${item.name}</h4>
-                    <p style="font-size: 12px; color: #aaa; margin-bottom: 10px;">${item.overview?.substring(0, 100) || ''}...</p>
-                    <div class="card-details-buttons">
-                        <button class="card-details-btn play" onclick="event.stopPropagation(); playContent('tv', ${item.id})">
-                            <i class="fas fa-play"></i> Play
-                        </button>
-                        <button class="card-details-btn info" onclick="event.stopPropagation(); openVideoModal(item)">
-                            <i class="fas fa-info-circle"></i> Info
-                        </button>
-                    </div>
                 </div>
             `;
             

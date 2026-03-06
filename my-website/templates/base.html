@@ -25,6 +25,10 @@
         </ul>
         
         <div class="navbar-actions">
+            <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+                <i class="fas fa-moon"></i>
+                <i class="fas fa-sun"></i>
+            </button>
             <div class="search-container" id="searchContainer">
                 <button class="search-icon-btn" onclick="toggleSearch()">
                     <i class="fas fa-search"></i>
@@ -138,6 +142,23 @@
         const API_KEY = '{{ api_key }}';
         const IMG_URL = '{{ img_url }}';
         let currentItem = null;
+
+        // Theme toggle function
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+
+        // Load saved theme on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            }
+        });
 
         // Navbar scroll effect
         window.addEventListener('scroll', () => {
