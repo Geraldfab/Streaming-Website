@@ -1182,6 +1182,10 @@ body {
     font-size: 2.5rem;
   }
   
+  .hero-content {
+    max-width: 450px;
+  }
+  
   .slider-btn {
     opacity: 1;
   }
@@ -1195,51 +1199,188 @@ body {
   }
   
   :root {
-    --card-width: 140px;
+    --card-width: 150px;
+    --card-gap: 10px;
   }
 }
 
 @media (max-width: 768px) {
   .navbar {
-    padding: 12px 20px;
+    padding: 10px 15px;
+  }
+  
+  .navbar-brand-text {
+    font-size: 20px;
+  }
+  
+  .navbar-actions {
+    gap: 10px;
   }
   
   .navbar-nav {
     display: none;
   }
   
-  .hero {
-    height: 60vh;
-    padding-bottom: 20%;
+  .hero-slider {
+    height: 55vh;
+    min-height: 350px;
+  }
+  
+  .hero-slide {
+    padding: 0 15px;
+    padding-bottom: 25%;
+  }
+  
+  .hero-content {
+    max-width: 100%;
   }
   
   .hero-title {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+  }
+  
+  .hero-meta {
+    font-size: 11px;
+    gap: 8px;
+    flex-wrap: wrap;
   }
   
   .hero-description {
-    font-size: 13px;
+    font-size: 12px;
     -webkit-line-clamp: 2;
+    margin-bottom: 12px;
   }
   
   .hero-buttons {
-    flex-direction: column;
+    flex-direction: row;
+    gap: 8px;
   }
   
   .btn {
-    width: 100%;
+    padding: 8px 16px;
+    font-size: 13px;
+    flex: 1;
+  }
+  
+  .hero-arrow {
+    width: 35px;
+    height: 60px;
+    font-size: 18px;
+    opacity: 0.7;
+  }
+  
+  .hero-nav {
+    bottom: 5%;
+  }
+  
+  .hero-dot {
+    width: 8px;
+    height: 8px;
+  }
+  
+  .hero-dot.active {
+    width: 18px;
   }
   
   .content-section {
-    padding: 0 20px;
+    padding: 0 15px;
+    margin-top: -60px;
+  }
+  
+  .row {
+    margin-bottom: 15px;
+  }
+  
+  .row-title {
+    font-size: 15px;
   }
   
   .card {
     width: 120px;
   }
   
+  .card-title {
+    font-size: 11px;
+  }
+  
+  .card-meta {
+    font-size: 10px;
+  }
+  
+  .slider-btn {
+    width: 30px;
+    font-size: 14px;
+  }
+  
+  .slider-btn.left {
+    left: -5px;
+  }
+  
+  .slider-btn.right {
+    right: -5px;
+  }
+  
+  .page-header {
+    padding: 80px 15px 15px;
+    top: 55px;
+  }
+  
+  .page-title {
+    font-size: 22px;
+  }
+  
+  .page-subtitle {
+    font-size: 12px;
+  }
+  
+  .category-tabs {
+    padding: 10px 15px;
+    top: 110px;
+  }
+  
+  .category-tab {
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+  
+  .genre-filter {
+    padding: 10px 15px;
+    top: 155px;
+    gap: 8px;
+  }
+  
+  .genre-filter label {
+    font-size: 11px;
+  }
+  
+  .genre-filter select,
+  .sort-filter select {
+    padding: 5px 8px;
+    font-size: 11px;
+  }
+  
+  .category-grid {
+    padding: 15px;
+    gap: 10px;
+  }
+  
+  .category-card-title {
+    font-size: 11px;
+  }
+  
+  .modal-content {
+    max-height: 85vh;
+    margin: 10px;
+  }
+  
+  .modal-body {
+    padding: 15px;
+  }
+  
   .modal-header {
     flex-direction: column;
+    gap: 12px;
   }
   
   .modal-poster {
@@ -1247,45 +1388,219 @@ body {
     margin: 0 auto;
   }
   
-  .category-grid {
-    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  .modal-title {
+    font-size: 18px;
+    text-align: center;
+  }
+  
+  .modal-meta {
+    justify-content: center;
+    font-size: 11px;
+  }
+  
+  .modal-genres {
+    justify-content: center;
+  }
+  
+  .modal-description {
+    font-size: 12px;
+  }
+  
+  .modal-actions {
+    flex-direction: column;
+  }
+  
+  .modal-server-select {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .search-modal {
+    padding: 70px 15px 30px;
+  }
+  
+  .search-modal-input {
+    font-size: 14px;
+    padding: 12px 15px;
+  }
+  
+  .search-modal-results {
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 10px;
+  }
+  
+  .search-result-title {
+    font-size: 10px;
+  }
+  
+  .footer {
+    padding: 25px 15px 15px;
+  }
+  
+  .footer-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  
+  .footer-section h4 {
+    font-size: 12px;
+  }
+  
+  .footer-links a {
+    font-size: 10px;
+  }
+  
+  .footer-social {
+    justify-content: center;
+  }
+  
+  .footer-bottom {
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
   }
   
   :root {
     --card-width: 120px;
-    --card-gap: 5px;
+    --card-gap: 8px;
   }
 }
 
 @media (max-width: 480px) {
+  .navbar {
+    padding: 8px 12px;
+  }
+  
+  .navbar-brand-text {
+    font-size: 18px;
+  }
+  
+  .user-avatar {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
+  
+  .theme-toggle,
+  .search-icon-btn {
+    padding: 6px;
+    font-size: 14px;
+  }
+  
+  .hero-slider {
+    height: 45vh;
+    min-height: 280px;
+  }
+  
   .hero-title {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
   }
   
   .hero-meta {
-    flex-wrap: wrap;
+    font-size: 10px;
   }
   
-  .page-title {
-    font-size: 24px;
+  .hero-description {
+    font-size: 11px;
+    -webkit-line-clamp: 1;
+  }
+  
+  .hero-buttons {
+    flex-direction: column;
+    gap: 6px;
+  }
+  
+  .btn {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+  
+  .hero-arrow {
+    width: 28px;
+    height: 45px;
+    font-size: 14px;
+  }
+  
+  .content-section {
+    padding: 0 12px;
+    margin-top: -40px;
+  }
+  
+  .row-title {
+    font-size: 14px;
+  }
+  
+  .row-view-all {
+    font-size: 10px;
   }
   
   .card {
     width: 100px;
   }
   
-  .footer-grid {
-    grid-template-columns: 1fr;
+  .card-info {
+    padding: 5px 0;
   }
   
-  .footer-bottom {
+  .card-title {
+    font-size: 10px;
+  }
+  
+  .page-header {
+    padding: 75px 12px 12px;
+  }
+  
+  .page-title {
+    font-size: 20px;
+  }
+  
+  .category-tabs {
+    padding: 8px 12px;
+    top: 105px;
+    gap: 6px;
+  }
+  
+  .category-tab {
+    padding: 5px 10px;
+    font-size: 10px;
+  }
+  
+  .genre-filter {
+    padding: 8px 12px;
+    top: 145px;
     flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .sort-filter {
+    margin-left: 0;
+    width: 100%;
+  }
+  
+  .category-grid {
+    padding: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
+    gap: 8px;
+  }
+  
+  .modal-title {
+    font-size: 16px;
+  }
+  
+  .search-modal-results {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  
+  .footer-grid {
+    grid-template-columns: 1fr;
     text-align: center;
   }
   
   :root {
     --card-width: 100px;
-    --card-gap: 4px;
+    --card-gap: 6px;
   }
 }
 
