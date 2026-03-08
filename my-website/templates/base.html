@@ -66,12 +66,32 @@
                     </div>
                 </div>
                 <div class="modal-server-select">
-                    <label for="serverSelect"><i class="fas fa-server"></i> Server:</label>
-                    <select id="serverSelect" onchange="changeServer()">
-                        <option value="vidsrc.cc">Vidsrc.cc (Primary)</option>
-                        <option value="vidsrc.me">Vidsrc.me</option>
-                        <option value="player.videasy.net">Player.Videasy.net</option>
-                    </select>
+                    <div class="server-options">
+                        <label for="serverSelect"><i class="fas fa-server"></i> Server:</label>
+                        <select id="serverSelect" onchange="changeServer()">
+                            <option value="zxcstream">ZxcStream (Primary)</option>
+                            <option value="vidsrc.cc">Vidsrc.cc</option>
+                            <option value="vidsrc.me">Vidsrc.me</option>
+                            <option value="player.videasy.net">Player.Videasy.net</option>
+                        </select>
+                    </div>
+                    <div class="season-episode-options" id="seasonEpisodeOptions" style="display: none;">
+                        <div class="select-group">
+                            <label for="seasonSelect"><i class="fas fa-layer-group"></i> Season:</label>
+                            <select id="seasonSelect" onchange="changeSeason()">
+                                <!-- Seasons loaded dynamically -->
+                            </select>
+                        </div>
+                        <div class="select-group">
+                            <label for="episodeSelect"><i class="fas fa-play-circle"></i> Episode:</label>
+                            <select id="episodeSelect" onchange="changeEpisode()">
+                                <!-- Episodes loaded dynamically -->
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" onclick="playEpisode()">
+                            <i class="fas fa-play"></i> Play
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -244,8 +264,13 @@
         }
 
         // Video Modal functions
+        let currentSeason = 1;
+        let currentEpisode = 1;
+        
         function openVideoModal(item) {
             currentItem = item;
+            currentSeason = 1;
+            currentEpisode = 1;
             const modal = document.getElementById('videoModal');
             
             document.getElementById('modalTitle').textContent = item.title || item.name;
@@ -254,9 +279,30 @@
             document.getElementById('modalRating').textContent = `★ ${item.vote_average?.toFixed(1) || 'N/A'}`;
             document.getElementById('modalYear').textContent = item.release_date || item.first_air_date?.substring(0, 4) || '';
             
+            // Runtime
+            const runtime = item.runtime || item.episode_run_time?.[0] || '';
+            document.getElementById('modalRuntime').textContent = runtime ? `${runtime} min` : '';
+            
             // Generate genres
             const genresContainer = document.getElementById('modalGenres');
             genresContainer.innerHTML = '';
+            if (item.genres) {
+                item.genres.forEach(genre => {
+                    const span = document.createElement('span');
+                    span.className = 'modal-genre';
+                    span.textContent = genre.name;
+                    genresContainer.appendChild(span);
+                });
+            }
+            
+            // Show/hide season/episode for TV shows
+            const seasonEpisodeOptions = document.getElementById('seasonEpisodeOptions');
+            if (item.media_type === 'tv' || item.first_air_date) {
+                seasonEpisodeOptions.style.display = 'flex';
+                loadSeasons(item);
+            } else {
+                seasonEpisodeOptions.style.display = 'none';
+            }
             
             changeServer();
             modal.classList.add('active');
@@ -264,7 +310,69 @@
             // Prevent body scroll
             document.body.style.overflow = 'hidden';
         }
-
+        
+        async function loadSeasons(item) {
+            try {
+                const response = await fetch(`/api/tv/${item.id}/season`);
+                const data = await response.json();
+                
+                const seasonSelect = document.getElementById('seasonSelect');
+                seasonSelect.innerHTML = '';
+                
+                if (data.seasons) {
+                    data.seasons.forEach(season => {
+                        if (season.season_number > 0) {
+                            const option = document.createElement('option');
+                            option.value = season.season_number;
+                            option.textContent = `Season ${season.season_number}`;
+                            seasonSelect.appendChild(option);
+                        }
+                    });
+                }
+                
+                currentSeason = parseInt(seasonSelect.value) || 1;
+                loadEpisodes(item, currentSeason);
+            } catch (error) {
+                console.error('Error loading seasons:', error);
+            }
+        }
+        
+        async function loadEpisodes(item, seasonNum) {
+            try {
+                const response = await fetch(`/api/tv/${item.id}/season/${seasonNum}`);
+                const data = await response.json();
+                
+                const episodeSelect = document.getElementById('episodeSelect');
+                episodeSelect.innerHTML = '';
+                
+                if (data.episodes) {
+                    data.episodes.forEach(episode => {
+                        const option = document.createElement('option');
+                        option.value = episode.episode_number;
+                        option.textContent = `E${episode.episode_number}: ${episode.name || 'Episode ' + episode.episode_number}`;
+                        episodeSelect.appendChild(option);
+                    });
+                }
+                
+                currentEpisode = parseInt(episodeSelect.value) || 1;
+            } catch (error) {
+                console.error('Error loading episodes:', error);
+            }
+        }
+        
+        function changeSeason() {
+            currentSeason = parseInt(document.getElementById('seasonSelect').value) || 1;
+            loadEpisodes(currentItem, currentSeason);
+        }
+        
+        function changeEpisode() {
+            currentEpisode = parseInt(document.getElementById('episodeSelect').value) || 1;
+        }
+        
+        function playEpisode() {
+            changeServer();
+        }
+        
         function closeVideoModal() {
             const modal = document.getElementById('videoModal');
             modal.classList.remove('active');
@@ -276,15 +384,22 @@
             if (!currentItem) return;
             
             const server = document.getElementById('serverSelect').value;
-            const type = currentItem.media_type === 'movie' ? 'movie' : 'tv';
+            const isMovie = currentItem.media_type === 'movie' || currentItem.release_date;
             let embedURL = '';
 
-            if (server === 'vidsrc.cc') {
+            if (server === 'zxcstream') {
+                if (isMovie) {
+                    embedURL = `https://zxcstream.xyz/embed/movie/${currentItem.id}`;
+                } else {
+                    embedURL = `https://zxcstream.xyz/embed/tv/${currentItem.id}/${currentSeason}/${currentEpisode}`;
+                }
+            } else if (server === 'vidsrc.cc') {
+                const type = isMovie ? 'movie' : 'tv';
                 embedURL = `https://vidsrc.cc/v2/embed/${type}/${currentItem.id}`;
             } else if (server === 'vidsrc.me') {
-                embedURL = `https://vidsrc.net/embed/${type}/?tmdb=${currentItem.id}`;
+                embedURL = `https://vidsrc.net/embed/${isMovie ? 'movie' : 'tv'}/?tmdb=${currentItem.id}`;
             } else if (server === 'player.videasy.net') {
-                embedURL = `https://player.videasy.net/${type}/${currentItem.id}`;
+                embedURL = `https://player.videasy.net/${isMovie ? 'movie' : 'tv'}/${currentItem.id}`;
             }
 
             document.getElementById('videoPlayer').src = embedURL;

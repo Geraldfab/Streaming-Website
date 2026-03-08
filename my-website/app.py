@@ -111,6 +111,20 @@ def api_tv_on_the_air():
     response = requests.get(url)
     return jsonify(response.json())
 
+@app.route('/api/tv/<int:tvmdb_id>/season')
+def api_tv_seasons(tvmdb_id):
+    """Get TV show seasons"""
+    url = f"{BASE_URL}/tv/{tvmdb_id}?api_key={API_KEY}"
+    response = requests.get(url)
+    return jsonify(response.json())
+
+@app.route('/api/tv/<int:tvmdb_id>/season/<int:season_number>')
+def api_tv_season_details(tvmdb_id, season_number):
+    """Get season details with episodes"""
+    url = f"{BASE_URL}/tv/{tvmdb_id}/season/{season_number}?api_key={API_KEY}"
+    response = requests.get(url)
+    return jsonify(response.json())
+
 @app.route('/api/discover/anime')
 def api_discover_anime():
     """Get anime content"""

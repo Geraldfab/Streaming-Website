@@ -319,16 +319,9 @@ body {
   font-weight: 600;
 }
 
-.hero-rating.high {
-  color: #46d369;
-}
-
-.hero-rating.medium {
+.hero-rating,
+.card-rating {
   color: #FFD700;
-}
-
-.hero-rating.low {
-  color: #ff6b6b;
 }
 
 .hero-year {
@@ -617,18 +610,6 @@ body {
   font-weight: 600;
 }
 
-.card-rating.high {
-  color: #46d369;
-}
-
-.card-rating.medium {
-  color: #FFD700;
-}
-
-.card-rating.low {
-  color: #ff6b6b;
-}
-
 /* ================================================
    MODAL / VIDEO PLAYER
    ================================================ */
@@ -780,11 +761,50 @@ body {
 
 .modal-server-select {
   display: flex;
-  align-items: center;
-  gap: 10px;
+  flex-direction: column;
+  gap: 12px;
   margin-top: 15px;
   padding-top: 15px;
-  border-top: 1px solid rgba(255,255,255,0.1);
+  border-top: 1px solid var(--border-color);
+}
+
+.server-options {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.season-episode-options {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  padding: 12px;
+  background: rgba(255,255,255,0.05);
+  border-radius: var(--border-radius);
+}
+
+.select-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.select-group label {
+  color: var(--text-secondary);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.select-group select {
+  padding: 6px 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  color: var(--text-primary);
+  font-size: 13px;
+  cursor: pointer;
+  min-width: 80px;
 }
 
 .modal-server-select label {
@@ -794,10 +814,10 @@ body {
 
 .modal-server-select select {
   padding: 8px 12px;
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.2);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
-  color: white;
+  color: var(--text-primary);
   font-size: 13px;
   cursor: pointer;
 }
