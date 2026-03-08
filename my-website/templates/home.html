@@ -200,23 +200,24 @@
             const slide = document.createElement('div');
             slide.className = 'hero-slide';
             slide.style.backgroundImage = `url(${IMG_URL}${item.backdrop_path})`;
+            slide.onclick = () => {
+                item.media_type = item.media_type || 'movie';
+                openVideoModal(item);
+            };
+            
+            const rating = item.vote_average || 0;
+            const ratingClass = rating >= 7 ? 'high' : rating >= 5 ? 'medium' : 'low';
+            
             slide.innerHTML = `
                 <div class="hero-content">
                     <h1 class="hero-title">${item.title || item.name}</h1>
                     <div class="hero-meta">
-                        <span class="hero-rating">★ ${item.vote_average?.toFixed(1) || 'N/A'}</span>
+                        <span class="hero-rating ${ratingClass}">★ ${rating.toFixed(1)}</span>
                         <span class="hero-year">${(item.release_date || item.first_air_date || '').substring(0, 4)}</span>
+                        <span class="hero-duration">${item.runtime ? item.runtime + ' min' : ''}</span>
                         <span class="hero-quality">HD</span>
                     </div>
                     <p class="hero-description">${item.overview || ''}</p>
-                    <div class="hero-buttons">
-                        <button class="btn btn-primary" onclick="playHeroContent(${index})">
-                            <i class="fas fa-play"></i> Play
-                        </button>
-                        <button class="btn btn-secondary" onclick="showHeroDetails(${index})">
-                            <i class="fas fa-info-circle"></i> More Info
-                        </button>
-                    </div>
                 </div>
             `;
             slidesContainer.appendChild(slide);
@@ -392,6 +393,8 @@
         
         items.slice(0, 20).forEach(item => {
             const type = item.media_type || 'movie';
+            const rating = item.vote_average || 0;
+            const ratingClass = rating >= 7 ? 'high' : rating >= 5 ? 'medium' : 'low';
             const card = document.createElement('div');
             card.className = 'card';
             card.innerHTML = `
@@ -399,7 +402,7 @@
                 <div class="card-info">
                     <h3 class="card-title">${item.title || item.name}</h3>
                     <div class="card-meta">
-                        <span class="card-rating">★ ${item.vote_average?.toFixed(1) || 'N/A'}</span>
+                        <span class="card-rating ${ratingClass}">★ ${rating.toFixed(1)}</span>
                         <span>${item.release_date ? item.release_date.substring(0, 4) : item.first_air_date ? item.first_air_date.substring(0, 4) : ''}</span>
                     </div>
                 </div>

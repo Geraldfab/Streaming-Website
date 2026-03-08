@@ -298,6 +298,12 @@ body {
   margin-bottom: 12px;
   text-shadow: 2px 2px 8px rgba(0,0,0,0.6);
   line-height: 1.15;
+  color: #ffffff;
+}
+
+[data-theme="light"] .hero-title {
+  color: #ffffff;
+  text-shadow: 2px 2px 10px rgba(0,0,0,0.8);
 }
 
 .hero-meta {
@@ -309,8 +315,20 @@ body {
 }
 
 .hero-rating {
-  color: #46d369;
+  color: #FFD700;
   font-weight: 600;
+}
+
+.hero-rating.high {
+  color: #46d369;
+}
+
+.hero-rating.medium {
+  color: #FFD700;
+}
+
+.hero-rating.low {
+  color: #ff6b6b;
 }
 
 .hero-year {
@@ -595,8 +613,20 @@ body {
 }
 
 .card-rating {
-  color: #46d369;
+  color: #FFD700;
   font-weight: 600;
+}
+
+.card-rating.high {
+  color: #46d369;
+}
+
+.card-rating.medium {
+  color: #FFD700;
+}
+
+.card-rating.low {
+  color: #ff6b6b;
 }
 
 /* ================================================
@@ -1264,10 +1294,7 @@ body {
   }
   
   .hero-arrow {
-    width: 35px;
-    height: 60px;
-    font-size: 18px;
-    opacity: 0.7;
+    display: none;
   }
   
   .hero-nav {
@@ -1309,16 +1336,7 @@ body {
   }
   
   .slider-btn {
-    width: 30px;
-    font-size: 14px;
-  }
-  
-  .slider-btn.left {
-    left: -5px;
-  }
-  
-  .slider-btn.right {
-    right: -5px;
+    display: none;
   }
   
   .page-header {
@@ -1517,9 +1535,7 @@ body {
   }
   
   .hero-arrow {
-    width: 28px;
-    height: 45px;
-    font-size: 14px;
+    display: none;
   }
   
   .content-section {
