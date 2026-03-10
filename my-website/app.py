@@ -168,7 +168,8 @@ def api_categories():
 def api_genre_content(type, genre_id):
     """Get content by genre"""
     page = request.args.get('page', '1')
-    url = f"{BASE_URL}/discover/{type}?api_key={API_KEY}&page={page}&with_genres={genre_id}"
+    sort_by = request.args.get('sort_by', 'popularity.desc')
+    url = f"{BASE_URL}/discover/{type}?api_key={API_KEY}&page={page}&with_genres={genre_id}&sort_by={sort_by}"
     response = requests.get(url)
     return jsonify(response.json())
 

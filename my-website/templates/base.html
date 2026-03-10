@@ -277,11 +277,13 @@
             document.getElementById('modalPoster').src = item.poster_path ? `${IMG_URL}${item.poster_path}` : '';
             document.getElementById('modalDescription').textContent = item.overview || 'No description available.';
             document.getElementById('modalRating').textContent = `★ ${item.vote_average?.toFixed(1) || 'N/A'}`;
-            document.getElementById('modalYear').textContent = item.release_date || item.first_air_date?.substring(0, 4) || '';
             
-            // Runtime
+            // Year and Duration for movies
+            const year = (item.release_date || item.first_air_date || '').substring(0, 4);
             const runtime = item.runtime || item.episode_run_time?.[0] || '';
-            document.getElementById('modalRuntime').textContent = runtime ? `${runtime} min` : '';
+            const yearDuration = year && runtime ? `${year} • ${runtime} min` : (year || (runtime ? `${runtime} min` : ''));
+            document.getElementById('modalYear').textContent = yearDuration;
+            document.getElementById('modalRuntime').textContent = '';
             
             // Generate genres
             const genresContainer = document.getElementById('modalGenres');

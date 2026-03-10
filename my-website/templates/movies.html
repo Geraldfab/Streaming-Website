@@ -111,22 +111,6 @@
             </button>
         </div>
     </div>
-
-    <!-- Upcoming -->
-    <div class="row">
-        <div class="row-header">
-            <h2 class="row-title">📅 Upcoming Movies</h2>
-        </div>
-        <div class="row-slider">
-            <button class="slider-btn left" onclick="scrollSlider('left', 'upcoming-movies')">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-            <div class="slider-container" id="upcoming-movies"></div>
-            <button class="slider-btn right" onclick="scrollSlider('right', 'upcoming-movies')">
-                <i class="fas fa-chevron-right"></i>
-            </button>
-        </div>
-    </div>
 </div>
 {% endblock %}
 
@@ -140,8 +124,7 @@
             loadTrendingMovies(),
             loadPopularMovies(),
             loadTopRatedMovies(),
-            loadNowPlaying(),
-            loadUpcomingMovies()
+            loadNowPlaying()
         ]);
     });
 
@@ -182,16 +165,6 @@
             displaySliderContent(data.results, 'nowplaying-movies');
         } catch (error) {
             console.error('Error loading now playing movies:', error);
-        }
-    }
-
-    async function loadUpcomingMovies() {
-        try {
-            const response = await fetch('/api/movies/upcoming');
-            const data = await response.json();
-            displaySliderContent(data.results, 'upcoming-movies');
-        } catch (error) {
-            console.error('Error loading upcoming movies:', error);
         }
     }
 
