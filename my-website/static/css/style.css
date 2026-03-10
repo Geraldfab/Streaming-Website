@@ -1641,16 +1641,6 @@ body {
     font-size: 16px;
   }
   
-  .search-modal-results {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 5px;
-  }
-  
-  .search-result-item img {
-    aspect-ratio: 2/3;
-    object-fit: cover;
-  }
-  
   .footer-grid {
     grid-template-columns: 1fr;
     text-align: center;
@@ -1659,6 +1649,26 @@ body {
   :root {
     --card-width: 100px;
     --card-gap: 6px;
+  }
+}
+
+@media (max-width: 768px) {
+  .search-modal-results {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 8px;
+    margin-top: 15px;
+  }
+
+  .search-result-item img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+    border-radius: 4px;
+  }
+
+  .search-result-title {
+    font-size: 9px;
   }
 }
 
