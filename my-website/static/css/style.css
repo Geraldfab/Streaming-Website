@@ -1360,7 +1360,7 @@ body {
   }
   
   .page-header {
-    padding: 80px 15px 15px;
+    padding: 85px 15px 15px;
     top: 55px;
   }
   
@@ -1374,7 +1374,7 @@ body {
   
   .category-tabs {
     padding: 10px 15px;
-    top: 110px;
+    top: 120px;
   }
   
   .category-tab {
@@ -1384,7 +1384,7 @@ body {
   
   .genre-filter {
     padding: 10px 15px;
-    top: 155px;
+    top: 175px;
     gap: 8px;
   }
   
@@ -1399,8 +1399,9 @@ body {
   }
   
   .category-grid {
-    padding: 15px;
+    padding: 20px 15px;
     gap: 10px;
+    margin-top: 40px;
   }
   
   .category-card-title {
@@ -1464,12 +1465,17 @@ body {
   }
   
   .search-modal-results {
-    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 15px;
+  }
+  
+  .search-result-item img {
+    aspect-ratio: 2/3;
   }
   
   .search-result-title {
-    font-size: 10px;
+    font-size: 9px;
   }
   
   .footer {
@@ -1584,7 +1590,8 @@ body {
   }
   
   .page-header {
-    padding: 75px 12px 12px;
+    padding: 80px 12px 12px;
+    top: 52px;
   }
   
   .page-title {
@@ -1593,7 +1600,7 @@ body {
   
   .category-tabs {
     padding: 8px 12px;
-    top: 105px;
+    top: 115px;
     gap: 6px;
   }
   
@@ -1604,7 +1611,7 @@ body {
   
   .genre-filter {
     padding: 8px 12px;
-    top: 145px;
+    top: 160px;
     flex-direction: column;
     align-items: flex-start;
   }
@@ -1615,9 +1622,10 @@ body {
   }
   
   .category-grid {
-    padding: 12px;
+    padding: 15px 12px;
     grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
     gap: 8px;
+    margin-top: 35px;
   }
   
   .modal-title {
