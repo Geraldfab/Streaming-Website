@@ -1465,17 +1465,26 @@ body {
   }
   
   .search-modal-results {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
     margin-top: 15px;
   }
   
+  .search-result-item {
+    width: 100%;
+  }
+  
   .search-result-item img {
+    width: 100%;
     aspect-ratio: 2/3;
+    object-fit: cover;
   }
   
   .search-result-title {
-    font-size: 9px;
+    font-size: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   
   .footer {
@@ -1633,8 +1642,13 @@ body {
   }
   
   .search-modal-results {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px;
+  }
+  
+  .search-result-item img {
+    aspect-ratio: 2/3;
+    object-fit: cover;
   }
   
   .footer-grid {
