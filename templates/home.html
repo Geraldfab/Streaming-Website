@@ -390,6 +390,7 @@
         
         items.slice(0, 20).forEach(item => {
             const type = item.media_type || 'movie';
+            item.media_type = type;  // Set media_type before opening modal
             const card = document.createElement('div');
             card.className = 'card';
             card.innerHTML = `
@@ -405,7 +406,6 @@
             
             // Click to open modal
             card.onclick = () => {
-                item.media_type = type;
                 openVideoModal(item);
             };
             
