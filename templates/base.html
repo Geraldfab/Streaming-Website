@@ -70,9 +70,9 @@
                         <label for="serverSelect"><i class="fas fa-server"></i> Server:</label>
                         <select id="serverSelect" onchange="changeServer()">
                             <option value="zxcstream">ZxcStream (Primary)</option>
-                            <option value="vidsrc.cc">Vidsrc.cc</option>
-                            <option value="vidsrc.me">Vidsrc.me</option>
-                            <option value="player.videasy.net">Player.Videasy.net</option>
+                            <option value="vidsrc.cc">Vidsrc</option>
+                            <option value="moviesapi.club">MoviesClub</option>
+                            <option value="player.videasy.net">Videasy</option>
                         </select>
                     </div>
                     <div class="season-episode-options" id="seasonEpisodeOptions" style="display: none;">
@@ -398,8 +398,12 @@
             } else if (server === 'vidsrc.cc') {
                 const type = isMovie ? 'movie' : 'tv';
                 embedURL = `https://vidsrc.cc/v2/embed/${type}/${currentItem.id}`;
-            } else if (server === 'vidsrc.me') {
-                embedURL = `https://vidsrc.net/embed/${isMovie ? 'movie' : 'tv'}/?tmdb=${currentItem.id}`;
+            } else if (server === 'moviesapi.club') {
+                if (isMovie) {
+                    embedURL = `https://moviesapi.club/movie/${currentItem.id}`;
+                } else {
+                    embedURL = `https:///moviesapi.club/tv/${currentItem.id}/${currentSeason}/${currentEpisode}`;
+                }
             } else if (server === 'player.videasy.net') {
                 embedURL = `https://player.videasy.net/${isMovie ? 'movie' : 'tv'}/${currentItem.id}`;
             }
