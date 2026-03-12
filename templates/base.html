@@ -393,7 +393,7 @@
                 if (isMovie) {
                     embedURL = `https://zxcstream.xyz/embed/movie/${currentItem.id}`;
                 } else {
-                    embedURL = `https://zxcstream.xyz/embed/tv/${currentItem.id}-${currentSeason}-${currentEpisode}`;
+                    embedURL = `https://zxcstream.xyz/embed/tv/${currentItem.id}/${currentSeason}/${currentEpisode}`;
                 }
             } else if (server === 'vidsrc.cc') {
                 const type = isMovie ? 'movie' : 'tv';
@@ -402,7 +402,7 @@
                 if (isMovie) {
                     embedURL = `https://moviesapi.club/movie/${currentItem.id}`;
                 } else {
-                    embedURL = `https:///moviesapi.club/tv/${currentItem.id}/${currentSeason}/${currentEpisode}`;
+                    embedURL = `https:///moviesapi.club/tv/${currentItem.id}-${currentSeason}-${currentEpisode}`;
                 }
             } else if (server === 'player.videasy.net') {
                 embedURL = `https://player.videasy.net/${isMovie ? 'movie' : 'tv'}/${currentItem.id}`;
