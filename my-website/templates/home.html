@@ -324,10 +324,23 @@
     async function loadPopularTVShows() {
         try {
             const response = await fetch('/api/tv/popular');
+            if (!response.ok) throw new Error('API Error');
             const data = await response.json();
-            displaySliderContent(data.results, 'popular-tv-slider');
+            if (data.results && data.results.length > 0) {
+                displaySliderContent(data.results, 'popular-tv-slider');
+            }
         } catch (error) {
             console.error('Error loading popular TV shows:', error);
+            // Try alternative endpoint
+            try {
+                const altResponse = await fetch('/api/tv/on_the_air');
+                const altData = await altResponse.json();
+                if (altData.results && altData.results.length > 0) {
+                    displaySliderContent(altData.results, 'popular-tv-slider');
+                }
+            } catch (e) {
+                console.error('Fallback also failed:', e);
+            }
         }
     }
 
@@ -335,10 +348,29 @@
     async function loadAnime() {
         try {
             const response = await fetch('/api/discover/anime');
+            if (!response.ok) throw new Error('API Error');
             const data = await response.json();
-            displaySliderContent(data.results, 'anime-slider');
+            if (data.results && data.results.length > 0) {
+                displaySliderContent(data.results, 'anime-slider');
+            }
         } catch (error) {
             console.error('Error loading anime:', error);
+            // Try alternative endpoint
+            try {
+                const altResponse = await fetch('/api/trending/tv');
+                const altData = await altResponse.json();
+                if (altData.results && altData.results.length > 0) {
+                    // Filter for anime
+                    const animeResults = altData.results.filter(item => 
+                        item.genre_ids && item.genre_ids.includes(16)
+                    );
+                    if (animeResults.length > 0) {
+                        displaySliderContent(animeResults, 'anime-slider');
+                    }
+                }
+            } catch (e) {
+                console.error('Fallback also failed:', e);
+            }
         }
     }
 
@@ -388,12 +420,15 @@
         
         container.innerHTML = '';
         
-        items.slice(0, 20).forEach(item => {
+        // Filter out items without valid data
+        const validItems = items.filter(item => item && (item.poster_path || item.backdrop_path));
+        
+        validItems.slice(0, 20).forEach(item => {
             const type = item.media_type || 'movie';
             const card = document.createElement('div');
             card.className = 'card';
             card.innerHTML = `
-                <img src="${IMG_URL}${item.poster_path}" alt="${item.title || item.name}" class="card-poster">
+                <img src="${IMG_URL}${item.poster_path}" alt="${item.title || item.name}" class="card-poster" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 300 450%22><rect fill=%22%231a1a1a%22 width=%22300%22 height=%22450%22/><text fill=%22%23666%22 font-family=%22sans-serif%22 font-size=%2220%22 x=%2210%25%22 y=%2250%25%22>No Image</text></svg>'">
                 <div class="card-info">
                     <h3 class="card-title">${item.title || item.name}</h3>
                     <div class="card-meta">

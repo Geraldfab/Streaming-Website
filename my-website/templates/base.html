@@ -56,7 +56,7 @@
         </button>
         <div class="modal-content">
             <div class="modal-video-container">
-                <iframe id="videoPlayer" src="" allowfullscreen></iframe>
+                <iframe id="videoPlayer" src="" allowfullscreen sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe>
             </div>
             <div class="modal-body">
                 <div class="modal-header">
@@ -416,6 +416,20 @@
 
         // Ad Blocking Logic
         (function() {
+            // Block popup windows
+            window.open = function() { return null; };
+            
+            // Prevent new window navigation
+            window.open = function(url, name, specs) {
+                // Instead of opening new window, load in current iframe
+                const iframe = document.getElementById('videoPlayer');
+                if (iframe && url) {
+                    iframe.src = url;
+                    return iframe;
+                }
+                return null;
+            };
+            
             // Check for ad blockers using common detection methods
             const checkAdBlock = function() {
                 // Method 1: Check if common ad-related elements exist
@@ -439,30 +453,10 @@
                 testAd.style.left = '-9999px';
                 document.body.appendChild(testAd);
                 
-                // If the element has no offsetHeight, ads are likely blocked
                 if (testAd.offsetHeight === 0) {
                     adsFound = true;
                 }
                 document.body.removeChild(testAd);
-                
-                // Method 3: Monitor iframe for ad-related content
-                const iframe = document.getElementById('videoPlayer');
-                if (iframe) {
-                    try {
-                        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-                        // Check for common ad patterns in iframe
-                        const adPatterns = ['ads', 'doubleclick', 'googlesyndication', 'adserver', 'advert'];
-                        adPatterns.forEach(pattern => {
-                            if (iframeDoc.body && iframeDoc.body.innerHTML.toLowerCase().includes(pattern)) {
-                                // Try to remove ad elements
-                                const adElements = iframeDoc.querySelectorAll('[class*="ad"], .advertisement, .ads');
-                                adElements.forEach(el => el.remove());
-                            }
-                        });
-                    } catch (e) {
-                        // Cross-origin iframe - can't access content
-                    }
-                }
                 
                 // Show notification if ads were blocked
                 if (adsFound) {
@@ -483,13 +477,6 @@
             
             // Run ad block check periodically
             setInterval(checkAdBlock, 2000);
-            
-            // Also check when modal opens
-            const originalOpenModal = openVideoModal;
-            window.openVideoModal = function(item) {
-                setTimeout(checkAdBlock, 1000);
-                return originalOpenModal(item);
-            };
         })();
 
         // Close modals on escape key
