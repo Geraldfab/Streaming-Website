@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="frame-ancestors 'self' https://*.zxcstream.xyz https://vidsrc.cc https://vidsrc.net https://player.videasy.net https://image.tmdb.org https://*.cloudfront.net https://cdnjs.cloudflare.com;">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <title>{% block title %}StreamFlix - Premium Streaming{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -10,6 +12,11 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
+    <!-- Ad Blocking Notification -->
+    <div id="adBlockNotification" class="ad-block-notification" style="display: none;">
+        <i class="fas fa-shield-alt"></i>
+        <span>Ads have been blocked for a better streaming experience!</span>
+    </div>
     <!-- Navigation -->
     <nav class="navbar" id="navbar">
         <a href="{{ url_for('home') }}" class="navbar-brand">
@@ -406,6 +413,84 @@
 
             document.getElementById('videoPlayer').src = embedURL;
         }
+
+        // Ad Blocking Logic
+        (function() {
+            // Check for ad blockers using common detection methods
+            const checkAdBlock = function() {
+                // Method 1: Check if common ad-related elements exist
+                const adSelectors = [
+                    '.ads', '.ad', '.advertisement', 
+                    '[class*="ads-"]', '[class*="advert"]',
+                    'iframe[src*="ads"]', 'iframe[src*="doubleclick"]'
+                ];
+                
+                let adsFound = false;
+                adSelectors.forEach(selector => {
+                    const elements = document.querySelectorAll(selector);
+                    if (elements.length > 0) adsFound = true;
+                });
+                
+                // Method 2: Check if ads are being blocked (fake ad element test)
+                const testAd = document.createElement('div');
+                testAd.innerHTML = '&nbsp;';
+                testAd.className = 'adsbox ad-banner';
+                testAd.style.position = 'absolute';
+                testAd.style.left = '-9999px';
+                document.body.appendChild(testAd);
+                
+                // If the element has no offsetHeight, ads are likely blocked
+                if (testAd.offsetHeight === 0) {
+                    adsFound = true;
+                }
+                document.body.removeChild(testAd);
+                
+                // Method 3: Monitor iframe for ad-related content
+                const iframe = document.getElementById('videoPlayer');
+                if (iframe) {
+                    try {
+                        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                        // Check for common ad patterns in iframe
+                        const adPatterns = ['ads', 'doubleclick', 'googlesyndication', 'adserver', 'advert'];
+                        adPatterns.forEach(pattern => {
+                            if (iframeDoc.body && iframeDoc.body.innerHTML.toLowerCase().includes(pattern)) {
+                                // Try to remove ad elements
+                                const adElements = iframeDoc.querySelectorAll('[class*="ad"], .advertisement, .ads');
+                                adElements.forEach(el => el.remove());
+                            }
+                        });
+                    } catch (e) {
+                        // Cross-origin iframe - can't access content
+                    }
+                }
+                
+                // Show notification if ads were blocked
+                if (adsFound) {
+                    showAdBlockNotification();
+                }
+            };
+            
+            // Show ad block notification
+            const showAdBlockNotification = function() {
+                const notification = document.getElementById('adBlockNotification');
+                if (notification) {
+                    notification.style.display = 'flex';
+                    setTimeout(() => {
+                        notification.style.display = 'none';
+                    }, 3500);
+                }
+            };
+            
+            // Run ad block check periodically
+            setInterval(checkAdBlock, 2000);
+            
+            // Also check when modal opens
+            const originalOpenModal = openVideoModal;
+            window.openVideoModal = function(item) {
+                setTimeout(checkAdBlock, 1000);
+                return originalOpenModal(item);
+            };
+        })();
 
         // Close modals on escape key
         document.addEventListener('keydown', (e) => {
