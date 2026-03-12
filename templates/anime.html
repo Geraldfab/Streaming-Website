@@ -1,0 +1,247 @@
+{% extends "base.html" %}
+
+{% block title %}Anime - StreamFlix{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<header class="page-header">
+    <h1 class="page-title">🎌 Anime</h1>
+    <p class="page-subtitle">Japanese animation from popular series to hidden gems</p>
+</header>
+
+<!-- Anime Categories -->
+<div class="category-tabs">
+    <button class="category-tab active" onclick="switchAnimeCategory('all', this)">All Anime</button>
+    <button class="category-tab" onclick="switchAnimeCategory('popular', this)">🔥 Popular</button>
+    <button class="category-tab" onclick="switchAnimeCategory('top_rated', this)">⭐ Top Rated</button>
+    <button class="category-tab" onclick="switchAnimeCategory('airing', this)">📺 Airing Now</button>
+    <button class="category-tab" onclick="switchAnimeCategory('movies', this)">🎬 Movies</button>
+    <button class="category-tab" onclick="switchAnimeCategory('dubbed', this)">🇺🇸 Dubbed</button>
+    <button class="category-tab" onclick="switchAnimeCategory('subbed', this)">🇯🇵 Subbed</button>
+</div>
+
+<!-- Content Section -->
+<div class="content-section">
+    <!-- All Anime -->
+    <div class="anime-category" id="category-all">
+        <div class="row">
+            <div class="row-header">
+                <h2 class="row-title">🎌 All Anime</h2>
+            </div>
+            <div class="row-slider">
+                <button class="slider-btn left" onclick="scrollSlider('left', 'anime-all')">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <div class="slider-container" id="anime-all"></div>
+                <button class="slider-btn right" onclick="scrollSlider('right', 'anime-all')">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Popular Anime -->
+    <div class="anime-category" id="category-popular" style="display: none;">
+        <div class="row">
+            <div class="row-header">
+                <h2 class="row-title">🔥 Popular Anime</h2>
+            </div>
+            <div class="row-slider">
+                <button class="slider-btn left" onclick="scrollSlider('left', 'anime-popular')">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <div class="slider-container" id="anime-popular"></div>
+                <button class="slider-btn right" onclick="scrollSlider('right', 'anime-popular')">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Rated Anime -->
+    <div class="anime-category" id="category-top_rated" style="display: none;">
+        <div class="row">
+            <div class="row-header">
+                <h2 class="row-title">⭐ Top Rated Anime</h2>
+            </div>
+            <div class="row-slider">
+                <button class="slider-btn left" onclick="scrollSlider('left', 'anime-top_rated')">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <div class="slider-container" id="anime-top_rated"></div>
+                <button class="slider-btn right" onclick="scrollSlider('right', 'anime-top_rated')">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Airing Now -->
+    <div class="anime-category" id="category-airing" style="display: none;">
+        <div class="row">
+            <div class="row-header">
+                <h2 class="row-title">📺 Currently Airing</h2>
+            </div>
+            <div class="row-slider">
+                <button class="slider-btn left" onclick="scrollSlider('left', 'anime-airing')">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <div class="slider-container" id="anime-airing"></div>
+                <button class="slider-btn right" onclick="scrollSlider('right', 'anime-airing')">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Featured Anime Banner -->
+<div class="content-section" style="margin-top: 20px;">
+    <div class="row">
+        <div class="row-header">
+            <h2 class="row-title">🌟 Featured This Season</h2>
+        </div>
+        <div class="row-slider">
+            <button class="slider-btn left" onclick="scrollSlider('left', 'featured-anime')">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="slider-container" id="featured-anime"></div>
+            <button class="slider-btn right" onclick="scrollSlider('right', 'featured-anime')">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let currentCategory = 'all';
+    let animeCache = {};
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        await loadAllAnime();
+        await loadFeaturedAnime();
+    });
+
+    async function loadAllAnime() {
+        if (animeCache['all']) {
+            displaySliderContent(animeCache['all'], 'anime-all');
+            return;
+        }
+        
+        try {
+            const response = await fetch('/api/discover/anime');
+            const data = await response.json();
+            animeCache['all'] = data.results;
+            displaySliderContent(data.results, 'anime-all');
+        } catch (error) {
+            console.error('Error loading anime:', error);
+        }
+    }
+
+    async function loadFeaturedAnime() {
+        try {
+            const response = await fetch('/api/discover/anime/popular');
+            const data = await response.json();
+            displaySliderContent(data.results.slice(0, 10), 'featured-anime');
+        } catch (error) {
+            console.error('Error loading featured anime:', error);
+        }
+    }
+
+    async function switchAnimeCategory(category, tabElement) {
+        // Update active tab
+        document.querySelectorAll('.category-tab').forEach(tab => tab.classList.remove('active'));
+        tabElement.classList.add('active');
+        
+        // Show/hide categories
+        document.querySelectorAll('.anime-category').forEach(cat => {
+            cat.style.display = 'none';
+        });
+        
+        const categorySection = document.getElementById(`category-${category}`);
+        if (categorySection) {
+            categorySection.style.display = 'block';
+        }
+        
+        // Load category if not cached
+        if (!animeCache[category]) {
+            await loadAnimeCategory(category);
+        } else {
+            displaySliderContent(animeCache[category], `anime-${category}`);
+        }
+        
+        currentCategory = category;
+    }
+
+    async function loadAnimeCategory(category) {
+        try {
+            let endpoint;
+            switch(category) {
+                case 'popular':
+                    endpoint = '/api/discover/anime/popular';
+                    break;
+                case 'top_rated':
+                    endpoint = '/api/discover/anime/top_rated';
+                    break;
+                case 'airing':
+                    endpoint = '/api/discover/anime/airing';
+                    break;
+                default:
+                    endpoint = '/api/discover/anime';
+            }
+            
+            const response = await fetch(endpoint);
+            const data = await response.json();
+            animeCache[category] = data.results;
+            displaySliderContent(data.results, `anime-${category}`);
+        } catch (error) {
+            console.error('Error loading anime category:', error);
+        }
+    }
+
+    function displaySliderContent(items, containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        
+        container.innerHTML = '';
+        
+        items.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            item.media_type = 'tv';
+            
+            card.innerHTML = `
+                <img src="${IMG_URL}${item.poster_path}" alt="${item.name}" class="card-poster">
+                <div class="card-info">
+                    <h3 class="card-title">${item.name}</h3>
+                    <div class="card-meta">
+                        <span class="card-rating">★ ${item.vote_average?.toFixed(1) || 'N/A'}</span>
+                        <span>${item.first_air_date ? item.first_air_date.substring(0, 4) : ''}</span>
+                    </div>
+                </div>
+                </div>
+            `;
+            
+            card.onclick = () => openVideoModal(item);
+            container.appendChild(card);
+        });
+    }
+
+    function playContent(type, id) {
+        const server = document.getElementById('serverSelect').value;
+        let embedURL = '';
+
+        if (server === 'vidsrc.cc') {
+            embedURL = `https://vidsrc.cc/v2/embed/${type}/${id}`;
+        } else if (server === 'vidsrc.me') {
+            embedURL = `https://vidsrc.net/embed/${type}/?tmdb=${id}`;
+        } else if (server === 'player.videasy.net') {
+            embedURL = `https://player.videasy.net/${type}/${id}`;
+        }
+
+        window.open(embedURL, '_blank');
+    }
+</script>
+{% endblock %}

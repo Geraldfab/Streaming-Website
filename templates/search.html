@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}Search Results - StreamFlix{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<header class="page-header">
+    <h1 class="page-title">Search Results</h1>
+    <p class="page-subtitle">Results for "{{ query }}"</p>
+</header>
+
+<!-- Loading State -->
+<div class="loading" id="loadingState">
+    <div class="loading-spinner"></div>
+</div>
+
+<!-- Content Grid -->
+<div class="category-grid" id="searchResults">
+    <!-- Results will be loaded dynamically -->
+</div>
+
+<!-- Empty State -->
+<div class="empty-state" id="emptyState" style="display: none;">
+    <div class="empty-state-icon">
+        <i class="fas fa-search"></i>
+    </div>
+    <p class="empty-state-text">No results found for "{{ query }}"</p>
+    <p style="color: #666; margin-top: 10px;">Try searching for movies, TV shows, or anime</p>
+</div>
+
+<!-- Pagination -->
+<div class="pagination" id="pagination" style="display: none;">
+    <button class="pagination-btn" id="prevPage" onclick="changePage(-1)" disabled>
+        <i class="fas fa-chevron-left"></i> Previous
+    </button>
+    <span class="pagination-info" id="pageInfo">Page 1</span>
+    <button class="pagination-btn" id="nextPage" onclick="changePage(1)">
+        Next <i class="fas fa-chevron-right"></i>
+    </button>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let currentPage = 1;
+    let totalPages = 1;
+    const query = '{{ query }}';
+
+    document.addEventListener('DOMContentLoaded', () => {
+        if (query) {
+            performSearch(query);
+        }
+    });
+
+    async function performSearch(searchQuery) {
+        // Show loading, hide content and empty state
+        document.getElementById('loadingState').style.display = 'flex';
+        document.getElementById('searchResults').style.display = 'none';
+        document.getElementById('emptyState').style.display = 'none';
+        document.getElementById('pagination').style.display = 'none';
+        
+        try {
+            const response = await fetch(`/api/search?query=${encodeURIComponent(searchQuery)}&page=${currentPage}`);
+            const data = await response.json();
+            
+            // Filter results
+            const results = data.results.filter(item => 
+                item.poster_path && 
+                (item.media_type === 'movie' || item.media_type === 'tv')
+            );
+            
+            totalPages = data.total_pages || 1;
+            
+            if (results.length === 0) {
+                showEmptyState();
+            } else {
+                displayResults(results);
+            }
+        } catch (error) {
+            console.error('Search error:', error);
+            showEmptyState();
+        }
+    }
+
+    function showEmptyState() {
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('searchResults').style.display = 'none';
+        document.getElementById('emptyState').style.display = 'block';
+        document.getElementById('pagination').style.display = 'none';
+    }
+
+    function displayResults(items) {
+        const grid = document.getElementById('searchResults');
+        grid.innerHTML = '';
+        
+        items.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'category-card';
+            
+            card.innerHTML = `
+                <img src="${IMG_URL}${item.poster_path}" alt="${item.title || item.name}">
+                <h3 class="category-card-title">${item.title || item.name}</h3>
+                <div class="card-meta" style="margin-top: 5px;">
+                    <span style="color: #e50914; font-size: 12px; text-transform: uppercase;">${item.media_type}</span>
+                    <span class="card-rating">★ ${item.vote_average?.toFixed(1) || 'N/A'}</span>
+                </div>
+            `;
+            
+            card.onclick = () => openVideoModal(item);
+            grid.appendChild(card);
+        });
+        
+        // Show content grid
+        document.getElementById('loadingState').style.display = 'none';
+        grid.style.display = 'grid';
+        
+        // Show pagination if there are more pages
+        if (totalPages > 1) {
+            document.getElementById('pagination').style.display = 'flex';
+            document.getElementById('pageInfo').textContent = `Page ${currentPage} of ${totalPages}`;
+            document.getElementById('prevPage').disabled = currentPage <= 1;
+            document.getElementById('nextPage').disabled = currentPage >= totalPages;
+        }
+    }
+
+    function changePage(delta) {
+        const newPage = currentPage + delta;
+        if (newPage >= 1 && newPage <= totalPages) {
+            currentPage = newPage;
+            performSearch(query);
+        }
+    }
+</script>
+{% endblock %}
