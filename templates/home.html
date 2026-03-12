@@ -84,6 +84,23 @@
             </button>
         </div>
     </div>
+
+    <!-- Trending Anime -->
+    <div class="row">
+        <div class="row-header">
+            <h2 class="row-title">🎌 Trending Anime</h2>
+            <a href="{{ url_for('anime') }}" class="row-view-all">View All <i class="fas fa-chevron-right"></i></a>
+        </div>
+        <div class="row-slider">
+            <button class="slider-btn left" onclick="scrollSlider('left', 'anime-slider')">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="slider-container" id="anime-slider"></div>
+            <button class="slider-btn right" onclick="scrollSlider('right', 'anime-slider')">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
 </div>
 {% endblock %}
 
@@ -220,7 +237,8 @@
         await Promise.all([
             loadRecommendedMovies(),
             loadTrendingTVShows(),
-            loadTopRatedMovies()
+            loadTopRatedMovies(),
+            loadTrendingAnime()
         ]);
         startHeroAutoSlide();
     });
@@ -334,6 +352,17 @@
             displaySliderContent(data.results, 'toprated-slider', 'movie');
         } catch (error) {
             console.error('Error loading top rated movies:', error);
+        }
+    }
+
+    // Fetch trending anime
+    async function loadTrendingAnime() {
+        try {
+            const response = await fetch('/api/discover/anime');
+            const data = await response.json();
+            displaySliderContent(data.results, 'anime-slider', 'tv');
+        } catch (error) {
+            console.error('Error loading trending anime:', error);
         }
     }
 
