@@ -19,8 +19,27 @@
     </div>
 </div>
 
-<!-- Content Sections -->
+<!-- Minimal Content Sections -->
 <div class="content-section">
+    <!-- Continue Watching - Shows recently watched/unfinished content -->
+    <div class="row" id="continue-watching-row" style="display: none;">
+        <div class="row-header">
+            <h2 class="row-title">⏯️ Continue Watching</h2>
+            <button class="clear-history-btn" onclick="clearWatchHistory()" title="Clear history">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+        </div>
+        <div class="row-slider">
+            <button class="slider-btn left" onclick="scrollSlider('left', 'continue-watching-slider')">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="slider-container" id="continue-watching-slider"></div>
+            <button class="slider-btn right" onclick="scrollSlider('right', 'continue-watching-slider')">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+
     <!-- Trending Movies -->
     <div class="row">
         <div class="row-header">
@@ -38,27 +57,10 @@
         </div>
     </div>
 
-    <!-- Popular Movies -->
+    <!-- Popular TV Shows -->
     <div class="row">
         <div class="row-header">
-            <h2 class="row-title">⭐ Popular Movies</h2>
-            <a href="{{ url_for('movies') }}" class="row-view-all">View All <i class="fas fa-chevron-right"></i></a>
-        </div>
-        <div class="row-slider">
-            <button class="slider-btn left" onclick="scrollSlider('left', 'popular-movies-slider')">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-            <div class="slider-container" id="popular-movies-slider"></div>
-            <button class="slider-btn right" onclick="scrollSlider('right', 'popular-movies-slider')">
-                <i class="fas fa-chevron-right"></i>
-            </button>
-        </div>
-    </div>
-
-    <!-- Trending TV Shows -->
-    <div class="row">
-        <div class="row-header">
-            <h2 class="row-title">📺 Trending TV Shows</h2>
+            <h2 class="row-title">📺 Popular TV Shows</h2>
             <a href="{{ url_for('tvshows') }}" class="row-view-all">View All <i class="fas fa-chevron-right"></i></a>
         </div>
         <div class="row-slider">
@@ -72,24 +74,7 @@
         </div>
     </div>
 
-    <!-- Popular TV Shows -->
-    <div class="row">
-        <div class="row-header">
-            <h2 class="row-title">🔥 Popular TV Shows</h2>
-            <a href="{{ url_for('tvshows') }}" class="row-view-all">View All <i class="fas fa-chevron-right"></i></a>
-        </div>
-        <div class="row-slider">
-            <button class="slider-btn left" onclick="scrollSlider('left', 'popular-tv-slider')">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-            <div class="slider-container" id="popular-tv-slider"></div>
-            <button class="slider-btn right" onclick="scrollSlider('right', 'popular-tv-slider')">
-                <i class="fas fa-chevron-right"></i>
-            </button>
-        </div>
-    </div>
-
-    <!-- Anime -->
+    <!-- Popular Anime -->
     <div class="row">
         <div class="row-header">
             <h2 class="row-title">🎌 Popular Anime</h2>
@@ -105,40 +90,6 @@
             </button>
         </div>
     </div>
-
-    <!-- Top Rated Movies -->
-    <div class="row">
-        <div class="row-header">
-            <h2 class="row-title">🏆 Top Rated Movies</h2>
-            <a href="{{ url_for('movies') }}" class="row-view-all">View All <i class="fas fa-chevron-right"></i></a>
-        </div>
-        <div class="row-slider">
-            <button class="slider-btn left" onclick="scrollSlider('left', 'toprated-movies-slider')">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-            <div class="slider-container" id="toprated-movies-slider"></div>
-            <button class="slider-btn right" onclick="scrollSlider('right', 'toprated-movies-slider')">
-                <i class="fas fa-chevron-right"></i>
-            </button>
-        </div>
-    </div>
-
-    <!-- Now Playing -->
-    <div class="row">
-        <div class="row-header">
-            <h2 class="row-title">🎬 Now Playing</h2>
-            <a href="{{ url_for('movies') }}" class="row-view-all">View All <i class="fas fa-chevron-right"></i></a>
-        </div>
-        <div class="row-slider">
-            <button class="slider-btn left" onclick="scrollSlider('left', 'nowplaying-slider')">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-            <div class="slider-container" id="nowplaying-slider"></div>
-            <button class="slider-btn right" onclick="scrollSlider('right', 'nowplaying-slider')">
-                <i class="fas fa-chevron-right"></i>
-            </button>
-        </div>
-    </div>
 </div>
 {% endblock %}
 
@@ -148,17 +99,209 @@
     let heroItems = [];
     let heroAutoSlideInterval;
 
+    // Watch history management using localStorage
+    const WATCH_HISTORY_KEY = 'streamflix_watch_history';
+    const MAX_HISTORY_ITEMS = 10;
+
+    // Get watch history from localStorage
+    function getWatchHistory() {
+        try {
+            const history = localStorage.getItem(WATCH_HISTORY_KEY);
+            return history ? JSON.parse(history) : [];
+        } catch (e) {
+            console.error('Error reading watch history:', e);
+            return [];
+        }
+    }
+
+    // Save item to watch history
+    function saveToWatchHistory(item) {
+        try {
+            let history = getWatchHistory();
+            
+            // Remove existing entry if present
+            history = history.filter(h => !(h.id === item.id && h.media_type === item.media_type));
+            
+            // Add to beginning with timestamp
+            history.unshift({
+                id: item.id,
+                media_type: item.media_type,
+                title: item.title || item.name,
+                poster_path: item.poster_path,
+                vote_average: item.vote_average,
+                release_date: item.release_date || item.first_air_date,
+                season: item.lastSeason || null,
+                episode: item.lastEpisode || null,
+                watchedAt: Date.now()
+            });
+            
+            // Keep only last N items
+            history = history.slice(0, MAX_HISTORY_ITEMS);
+            
+            localStorage.setItem(WATCH_HISTORY_KEY, JSON.stringify(history));
+            loadContinueWatching();
+        } catch (e) {
+            console.error('Error saving to watch history:', e);
+        }
+    }
+
+    // Update watch progress for TV shows
+    function updateWatchProgress(item, season, episode) {
+        try {
+            let history = getWatchHistory();
+            const existingIndex = history.findIndex(h => h.id === item.id && h.media_type === 'tv');
+            
+            if (existingIndex !== -1) {
+                history[existingIndex].season = season;
+                history[existingIndex].episode = episode;
+                history[existingIndex].watchedAt = Date.now();
+                // Move to front
+                const item = history.splice(existingIndex, 1)[0];
+                history.unshift(item);
+            } else {
+                history.unshift({
+                    id: item.id,
+                    media_type: 'tv',
+                    title: item.title || item.name,
+                    poster_path: item.poster_path,
+                    vote_average: item.vote_average,
+                    release_date: item.release_date || item.first_air_date,
+                    season: season,
+                    episode: episode,
+                    watchedAt: Date.now()
+                });
+            }
+            
+            history = history.slice(0, MAX_HISTORY_ITEMS);
+            localStorage.setItem(WATCH_HISTORY_KEY, JSON.stringify(history));
+            loadContinueWatching();
+        } catch (e) {
+            console.error('Error updating watch progress:', e);
+        }
+    }
+
+    // Remove item from watch history
+    function removeFromWatchHistory(item) {
+        try {
+            let history = getWatchHistory();
+            history = history.filter(h => !(h.id === item.id && h.media_type === item.media_type));
+            localStorage.setItem(WATCH_HISTORY_KEY, JSON.stringify(history));
+            loadContinueWatching();
+        } catch (e) {
+            console.error('Error removing from watch history:', e);
+        }
+    }
+
+    // Clear all watch history
+    function clearWatchHistory() {
+        if (confirm('Clear all watch history?')) {
+            localStorage.removeItem(WATCH_HISTORY_KEY);
+            loadContinueWatching();
+        }
+    }
+
+    // Load continue watching content
+    function loadContinueWatching() {
+        const history = getWatchHistory();
+        const row = document.getElementById('continue-watching-row');
+        const container = document.getElementById('continue-watching-slider');
+        
+        if (!history || history.length === 0) {
+            row.style.display = 'none';
+            return;
+        }
+        
+        row.style.display = 'block';
+        container.innerHTML = '';
+        
+        history.forEach(item => {
+            const type = item.media_type || 'movie';
+            const card = document.createElement('div');
+            card.className = 'card';
+            
+            // Calculate progress percentage (mock - would need actual duration)
+            const progress = Math.floor(Math.random() * 70) + 10; // 10-80%
+            
+            card.innerHTML = `
+                <div class="card-progress-container">
+                    <img src="${IMG_URL}${item.poster_path}" alt="${item.title}" class="card-poster">
+                    <div class="card-progress-bar">
+                        <div class="card-progress-fill" style="width: ${progress}%"></div>
+                    </div>
+                    <div class="card-overlay-buttons">
+                        <button class="card-play-btn" onclick="event.stopPropagation(); playFromHistory(${item.id}, '${type}', ${item.season}, ${item.episode})">
+                            <i class="fas fa-play"></i>
+                        </button>
+                        <button class="card-remove-btn" onclick="event.stopPropagation(); removeItemFromHistory(${item.id}, '${type}')">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-info">
+                    <h3 class="card-title">${item.title}</h3>
+                    <div class="card-meta">
+                        <span class="card-rating">★ ${(item.vote_average || 0).toFixed(1)}</span>
+                        <span>${item.season ? 'S' + item.season + 'E' + item.episode : (item.release_date ? item.release_date.substring(0, 4) : '')}</span>
+                    </div>
+                </div>
+            `;
+            
+            card.onclick = () => {
+                const fullItem = {...item};
+                openVideoModal(fullItem);
+            };
+            
+            container.appendChild(card);
+        });
+    }
+
+    // Remove specific item from history
+    function removeItemFromHistory(id, type) {
+        removeFromWatchHistory({id: id, media_type: type});
+    }
+
+    // Play from history
+    function playFromHistory(id, type, season, episode) {
+        const server = document.getElementById('serverSelect').value;
+        let embedURL = '';
+
+        if (server === 'zxcstream') {
+            if (type === 'movie') {
+                embedURL = `https://zxcstream.xyz/embed/movie/${id}`;
+            } else {
+                embedURL = `https://zxcstream.xyz/embed/tv/${id}/${season || 1}/${episode || 1}`;
+            }
+        } else if (server === 'vidsrc.cc') {
+            embedURL = `https://vidsrc.cc/v2/embed/${type}/${id}`;
+        } else if (server === 'vidsrc.me') {
+            embedURL = `https://vidsrc.net/embed/${type}/?tmdb=${id}`;
+        } else if (server === 'player.videasy.net') {
+            embedURL = `https://player.videasy.net/${type}/${id}`;
+        }
+
+        window.open(embedURL, '_blank');
+    }
+
+    // Override openVideoModal to save to watch history
+    const originalOpenVideoModal = openVideoModal;
+    openVideoModal = function(item) {
+        // Save to watch history before opening modal
+        if (item && item.id) {
+            saveToWatchHistory(item);
+        }
+        originalOpenVideoModal(item);
+    };
+
     // Load all content on page load
     document.addEventListener('DOMContentLoaded', async () => {
+        // Load continue watching first
+        loadContinueWatching();
+        
         await loadHeroContent();
         await Promise.all([
             loadTrendingMovies(),
-            loadPopularMovies(),
-            loadTrendingTVShows(),
             loadPopularTVShows(),
-            loadAnime(),
-            loadTopRatedMovies(),
-            loadNowPlaying()
+            loadAnime()
         ]);
         // Start auto-slide after content loads
         startHeroAutoSlide();
@@ -200,29 +343,34 @@
             const slide = document.createElement('div');
             slide.className = 'hero-slide';
             slide.style.backgroundImage = `url(${IMG_URL}${item.backdrop_path})`;
-            slide.onclick = () => {
-                item.media_type = item.media_type || 'movie';
-                openVideoModal(item);
-            };
+            slide.onclick = () => openVideoModal(item);
             
-            slide.innerHTML = `
-                <div class="hero-content">
-                    <h1 class="hero-title">${item.title || item.name}</h1>
-                    <div class="hero-meta">
-                        <span class="hero-rating">★ ${(item.vote_average || 0).toFixed(1)}</span>
-                        <span class="hero-year">${(item.release_date || item.first_air_date || '').substring(0, 4)}</span>
-                        <span class="hero-duration">${item.runtime ? item.runtime + ' min' : ''}</span>
-                        <span class="hero-quality">HD</span>
-                    </div>
-                    <p class="hero-description">${item.overview || ''}</p>
+            const content = document.createElement('div');
+            content.className = 'hero-content';
+            content.innerHTML = `
+                <h1 class="hero-title">${item.title || item.name}</h1>
+                <div class="hero-meta">
+                    <span class="hero-rating">★ ${item.vote_average?.toFixed(1) || 'N/A'}</span>
+                    <span class="hero-year">${(item.release_date || item.first_air_date || '').substring(0, 4)}</span>
+                    <span class="hero-quality">HD</span>
+                </div>
+                <p class="hero-description">${item.overview || ''}</p>
+                <div class="hero-buttons">
+                    <button class="btn btn-primary" onclick="event.stopPropagation(); playHeroContent(${index})">
+                        <i class="fas fa-play"></i> Play
+                    </button>
+                    <button class="btn btn-secondary" onclick="event.stopPropagation(); showHeroDetails(${index})">
+                        <i class="fas fa-info-circle"></i> More Info
+                    </button>
                 </div>
             `;
+            slide.appendChild(content);
             slidesContainer.appendChild(slide);
             
             // Create dot
             const dot = document.createElement('button');
             dot.className = `hero-dot ${index === 0 ? 'active' : ''}`;
-            dot.onclick = () => goToSlide(index);
+            dot.onclick = (e) => { e.stopPropagation(); goToSlide(index); };
             navContainer.appendChild(dot);
         });
     }
@@ -288,35 +436,9 @@
         try {
             const response = await fetch('/api/trending/movie');
             const data = await response.json();
-            displaySliderContent(data.results, 'movies-slider');
-            // Set hero with first movie
-            if (data.results && data.results.length > 0) {
-                setHeroContent(data.results[0], 'movie');
-            }
+            displaySliderContent(data.results, 'movies-slider', 'movie');
         } catch (error) {
             console.error('Error loading trending movies:', error);
-        }
-    }
-
-    // Fetch and display popular movies
-    async function loadPopularMovies() {
-        try {
-            const response = await fetch('/api/movies/popular');
-            const data = await response.json();
-            displaySliderContent(data.results, 'popular-movies-slider');
-        } catch (error) {
-            console.error('Error loading popular movies:', error);
-        }
-    }
-
-    // Fetch and display trending TV shows
-    async function loadTrendingTVShows() {
-        try {
-            const response = await fetch('/api/trending/tv');
-            const data = await response.json();
-            displaySliderContent(data.results, 'tvshows-slider');
-        } catch (error) {
-            console.error('Error loading trending TV shows:', error);
         }
     }
 
@@ -325,7 +447,7 @@
         try {
             const response = await fetch('/api/tv/popular');
             const data = await response.json();
-            displaySliderContent(data.results, 'popular-tv-slider');
+            displaySliderContent(data.results, 'tvshows-slider', 'tv');
         } catch (error) {
             console.error('Error loading popular TV shows:', error);
         }
@@ -334,63 +456,25 @@
     // Fetch and display anime
     async function loadAnime() {
         try {
-            const response = await fetch('/api/discover/anime');
+            const response = await fetch('/api/discover/anime/popular');
             const data = await response.json();
-            displaySliderContent(data.results, 'anime-slider');
+            displaySliderContent(data.results, 'anime-slider', 'tv');
         } catch (error) {
             console.error('Error loading anime:', error);
         }
     }
 
-    // Fetch and display top rated movies
-    async function loadTopRatedMovies() {
-        try {
-            const response = await fetch('/api/movies/top_rated');
-            const data = await response.json();
-            displaySliderContent(data.results, 'toprated-movies-slider');
-        } catch (error) {
-            console.error('Error loading top rated movies:', error);
-        }
-    }
-
-    // Fetch and display now playing movies
-    async function loadNowPlaying() {
-        try {
-            const response = await fetch('/api/movies/now_playing');
-            const data = await response.json();
-            displaySliderContent(data.results, 'nowplaying-slider');
-        } catch (error) {
-            console.error('Error loading now playing movies:', error);
-        }
-    }
-
-    // Set hero content
-    function setHeroContent(item, type) {
-        const hero = document.getElementById('hero');
-        hero.style.backgroundImage = `linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.8) 100%), url(${IMG_URL}${item.backdrop_path || item.poster_path})`;
-        
-        document.getElementById('heroTitle').textContent = item.title || item.name;
-        document.getElementById('heroDescription').textContent = item.overview;
-        document.getElementById('heroRating').textContent = `★ ${item.vote_average?.toFixed(1) || 'N/A'}`;
-        
-        const year = item.release_date || item.first_air_date;
-        document.getElementById('heroYear').textContent = year ? year.substring(0, 4) : '';
-        
-        // Store for modal
-        item.media_type = type;
-        window.heroItem = item;
-    }
-
-    // Display content in slider
-    function displaySliderContent(items, containerId) {
+    // Display content in slider with progress indicator
+    function displaySliderContent(items, containerId, defaultType = 'movie') {
         const container = document.getElementById(containerId);
         if (!container) return;
         
         container.innerHTML = '';
         
         items.slice(0, 20).forEach(item => {
-            const type = item.media_type || 'movie';
-            item.media_type = type;  // Set media_type before opening modal
+            const type = item.media_type || defaultType;
+            item.media_type = type;
+            
             const card = document.createElement('div');
             card.className = 'card';
             card.innerHTML = `
@@ -418,7 +502,13 @@
         const server = document.getElementById('serverSelect').value;
         let embedURL = '';
 
-        if (server === 'vidsrc.cc') {
+        if (server === 'zxcstream') {
+            if (type === 'movie') {
+                embedURL = `https://zxcstream.xyz/embed/movie/${id}`;
+            } else {
+                embedURL = `https://zxcstream.xyz/embed/tv/${id}/1/1`;
+            }
+        } else if (server === 'vidsrc.cc') {
             embedURL = `https://vidsrc.cc/v2/embed/${type}/${id}`;
         } else if (server === 'vidsrc.me') {
             embedURL = `https://vidsrc.net/embed/${type}/?tmdb=${id}`;

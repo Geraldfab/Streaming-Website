@@ -1713,3 +1713,293 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);
 }
+
+
+/* ================================================
+   CONTINUE WATCHING SECTION
+   ================================================ */
+.clear-history-btn {
+    background: rgba(255,255,255,0.1);
+    border: none;
+    color: var(--text-secondary);
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all var(--transition-fast);
+}
+
+.clear-history-btn:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+.card-progress-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.card-progress-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: rgba(255,255,255,0.2);
+}
+
+.card-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-color), #ff6b6b);
+    transition: width 0.3s ease;
+}
+
+.card-overlay-buttons {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    gap: 10px;
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+}
+
+.card-progress-container:hover .card-overlay-buttons {
+    opacity: 1;
+}
+
+.card-progress-container:hover .card-poster {
+    filter: brightness(0.6);
+}
+
+.card-play-btn,
+.card-remove-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    transition: all var(--transition-fast);
+}
+
+.card-play-btn {
+    background: var(--primary-color);
+    color: white;
+}
+
+.card-play-btn:hover {
+    transform: scale(1.1);
+    background: var(--primary-dark);
+}
+
+.card-remove-btn {
+    background: rgba(255,255,255,0.2);
+    color: white;
+}
+
+.card-remove-btn:hover {
+    background: rgba(255,0,0,0.7);
+}
+
+/* ================================================
+   ENHANCED CARD STYLES
+   ================================================ */
+.card {
+    position: relative;
+    overflow: hidden;
+    transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+.card:hover {
+    transform: scale(1.05) translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.4);
+    z-index: 10;
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%);
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+    pointer-events: none;
+}
+
+.card:hover::before {
+    opacity: 1;
+}
+
+.card-poster {
+    transition: transform var(--transition-normal);
+}
+
+.card:hover .card-poster {
+    transform: scale(1.05);
+}
+
+/* ================================================
+   HERO SECTION ENHANCEMENTS
+   ================================================ */
+.hero-slide {
+    cursor: pointer;
+}
+
+.hero-content {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.btn {
+    padding: 12px 28px;
+    border: none;
+    border-radius: 4px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--primary-dark);
+    transform: scale(1.05);
+}
+
+.btn-secondary {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    backdrop-filter: blur(4px);
+}
+
+.btn-secondary:hover {
+    background: rgba(255,255,255,0.3);
+    transform: scale(1.05);
+}
+
+/* ================================================
+   SMOOTH ANIMATIONS
+   ================================================ */
+.row {
+    animation: fadeIn 0.5s ease-out;
+    animation-fill-mode: both;
+}
+
+.row:nth-child(1) { animation-delay: 0.1s; }
+.row:nth-child(2) { animation-delay: 0.2s; }
+.row:nth-child(3) { animation-delay: 0.3s; }
+.row:nth-child(4) { animation-delay: 0.4s; }
+.row:nth-child(5) { animation-delay: 0.5s; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ================================================
+   RESPONSIVE IMPROVEMENTS
+   ================================================ */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .hero-buttons {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .card {
+        min-width: 140px;
+    }
+    
+    .navbar-nav {
+        display: none;
+    }
+}
+
+/* ================================================
+   LOADING SKELETON
+   ================================================ */
+.skeleton {
+    background: linear-gradient(90deg, 
+        var(--bg-card) 25%, 
+        var(--bg-hover) 50%, 
+        var(--bg-card) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* ================================================
+   MODAL ENHANCEMENTS
+   ================================================ */
+.modal-overlay {
+    backdrop-filter: blur(8px);
+}
+
+.modal-content {
+    animation: scaleIn 0.3s ease-out;
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.modal-video-container {
+    background: #000;
+    border-radius: 8px 8px 0 0;
+    overflow: hidden;
+}
+
+.modal-video-container iframe {
+    aspect-ratio: 16/9;
+}
+
