@@ -393,7 +393,7 @@
                 if (isMovie) {
                     embedURL = `https://zxcstream.xyz/embed/movie/${currentItem.id}`;
                 } else {
-                    embedURL = `https://zxcstream.xyz/embed/tv/${currentItem.id}/${currentSeason}/${currentEpisode}`;
+                    embedURL = `https://zxcstream.xyz/embed/tv/${currentItem.id}-${currentSeason}-${currentEpisode}`;
                 }
             } else if (server === 'vidsrc.cc') {
                 const type = isMovie ? 'movie' : 'tv';
