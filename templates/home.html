@@ -247,7 +247,7 @@
         }
     }
 
-    // Display hero slides (without buttons)
+    // Display hero slides (with info)
     function displayHeroSlides() {
         const slidesContainer = document.getElementById('heroSlides');
         const navContainer = document.getElementById('heroNav');
@@ -261,6 +261,19 @@
             slide.style.backgroundImage = `url(${IMG_URL}${item.backdrop_path})`;
             slide.onclick = () => openVideoModal(item);
             
+            // Add content overlay with title, rating, year, quality, synopsis
+            const content = document.createElement('div');
+            content.className = 'hero-content';
+            content.innerHTML = `
+                <h1 class="hero-title">${item.title || item.name}</h1>
+                <div class="hero-meta">
+                    <span class="hero-rating">★ ${item.vote_average?.toFixed(1) || 'N/A'}</span>
+                    <span class="hero-year">${(item.release_date || item.first_air_date || '').substring(0, 4)}</span>
+                    <span class="hero-quality">HD</span>
+                </div>
+                <p class="hero-description">${item.overview || ''}</p>
+            `;
+            slide.appendChild(content);
             slidesContainer.appendChild(slide);
             
             const dot = document.createElement('button');
