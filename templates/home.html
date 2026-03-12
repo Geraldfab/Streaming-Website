@@ -13,7 +13,7 @@
     </div>
 </div>
 
-<!-- Content Sections - 4 Fixed Rows -->
+<!-- Content Sections - 4 Scrollable Rows -->
 <div class="content-section">
     <!-- Continue Watching -->
     <div class="row" id="continue-watching-row" style="display: none;">
@@ -23,7 +23,15 @@
                 <i class="fas fa-trash-alt"></i>
             </button>
         </div>
-        <div class="row-grid" id="continue-watching-grid"></div>
+        <div class="row-slider">
+            <button class="slider-btn left" onclick="scrollSlider('left', 'continue-watching-slider')">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="slider-container" id="continue-watching-slider"></div>
+            <button class="slider-btn right" onclick="scrollSlider('right', 'continue-watching-slider')">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
     </div>
 
     <!-- Recommended Movies -->
@@ -32,7 +40,15 @@
             <h2 class="row-title">⭐ Recommended Movies</h2>
             <a href="{{ url_for('movies') }}" class="row-view-all">View All <i class="fas fa-chevron-right"></i></a>
         </div>
-        <div class="row-grid" id="movies-grid"></div>
+        <div class="row-slider">
+            <button class="slider-btn left" onclick="scrollSlider('left', 'movies-slider')">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="slider-container" id="movies-slider"></div>
+            <button class="slider-btn right" onclick="scrollSlider('right', 'movies-slider')">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
     </div>
 
     <!-- Trending TV Shows -->
@@ -41,7 +57,15 @@
             <h2 class="row-title">🔥 Trending TV Shows</h2>
             <a href="{{ url_for('tvshows') }}" class="row-view-all">View All <i class="fas fa-chevron-right"></i></a>
         </div>
-        <div class="row-grid" id="tvshows-grid"></div>
+        <div class="row-slider">
+            <button class="slider-btn left" onclick="scrollSlider('left', 'tvshows-slider')">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="slider-container" id="tvshows-slider"></div>
+            <button class="slider-btn right" onclick="scrollSlider('right', 'tvshows-slider')">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
     </div>
 
     <!-- Top Rated Movies -->
@@ -50,7 +74,15 @@
             <h2 class="row-title">🏆 Top Rated Movies</h2>
             <a href="{{ url_for('movies') }}" class="row-view-all">View All <i class="fas fa-chevron-right"></i></a>
         </div>
-        <div class="row-grid" id="toprated-grid"></div>
+        <div class="row-slider">
+            <button class="slider-btn left" onclick="scrollSlider('left', 'toprated-slider')">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="slider-container" id="toprated-slider"></div>
+            <button class="slider-btn right" onclick="scrollSlider('right', 'toprated-slider')">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
     </div>
 </div>
 {% endblock %}
@@ -131,7 +163,7 @@
     function loadContinueWatching() {
         const history = getWatchHistory();
         const row = document.getElementById('continue-watching-row');
-        const container = document.getElementById('continue-watching-grid');
+        const container = document.getElementById('continue-watching-slider');
         
         if (!history || history.length === 0) {
             row.style.display = 'none';
@@ -141,7 +173,7 @@
         row.style.display = 'block';
         container.innerHTML = '';
         
-        history.slice(0, 6).forEach(item => {
+        history.slice(0, 12).forEach(item => {
             const type = item.media_type || 'movie';
             const card = document.createElement('div');
             card.className = 'card';
@@ -264,7 +296,7 @@
         try {
             const response = await fetch('/api/movies/popular');
             const data = await response.json();
-            displayGridContent(data.results, 'movies-grid', 'movie');
+            displaySliderContent(data.results, 'movies-slider', 'movie');
         } catch (error) {
             console.error('Error loading recommended movies:', error);
         }
@@ -275,7 +307,7 @@
         try {
             const response = await fetch('/api/trending/tv');
             const data = await response.json();
-            displayGridContent(data.results, 'tvshows-grid', 'tv');
+            displaySliderContent(data.results, 'tvshows-slider', 'tv');
         } catch (error) {
             console.error('Error loading trending TV shows:', error);
         }
@@ -286,20 +318,20 @@
         try {
             const response = await fetch('/api/movies/top_rated');
             const data = await response.json();
-            displayGridContent(data.results, 'toprated-grid', 'movie');
+            displaySliderContent(data.results, 'toprated-slider', 'movie');
         } catch (error) {
             console.error('Error loading top rated movies:', error);
         }
     }
 
-    // Display content in grid (no scrolling)
-    function displayGridContent(items, containerId, defaultType = 'movie') {
+    // Display content in slider (scrollable)
+    function displaySliderContent(items, containerId, defaultType = 'movie') {
         const container = document.getElementById(containerId);
         if (!container) return;
         
         container.innerHTML = '';
         
-        items.slice(0, 6).forEach(item => {
+        items.slice(0, 20).forEach(item => {
             const type = item.media_type || defaultType;
             item.media_type = type;
             
