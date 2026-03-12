@@ -296,13 +296,12 @@ body {
   font-size: 3.2rem;
   font-weight: 700;
   margin-bottom: 12px;
-  text-shadow: 2px 2px 8px rgba(0,0,0,0.6);
+  text-shadow: 2px 2px 8px rgba(0,0,0,0.8);
   line-height: 1.15;
   color: #ffffff;
 }
 
 [data-theme="light"] .hero-title {
-  color: #ffffff;
   text-shadow: 2px 2px 10px rgba(0,0,0,0.8);
 }
 
@@ -325,24 +324,25 @@ body {
 }
 
 .hero-year {
-  color: var(--text-secondary);
+  color: rgba(255,255,255,0.8);
 }
 
 .hero-duration {
-  color: var(--text-secondary);
+  color: rgba(255,255,255,0.8);
 }
 
 .hero-quality {
-  border: 1px solid var(--text-muted);
+  border: 1px solid rgba(255,255,255,0.6);
   padding: 2px 6px;
   font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
+  color: #ffffff;
 }
 
 .hero-description {
   font-size: 15px;
-  color: var(--text-secondary);
+  color: rgba(255,255,255,0.8);
   margin-bottom: 20px;
   line-height: 1.6;
   display: -webkit-box;
@@ -2006,5 +2006,12 @@ body {
 /* Simplified hero without buttons */
 .hero-slider {
     cursor: pointer;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 10;
+    max-width: 550px;
+    padding-bottom: 10%;
 }
 
