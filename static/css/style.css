@@ -238,6 +238,26 @@ body {
   display: block;
 }
 
+/* Mobile Categories Button */
+.mobile-categories-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  color: var(--text-secondary);
+  font-size: 16px;
+  text-decoration: none;
+  transition: all var(--transition-fast);
+}
+
+.mobile-categories-btn:hover {
+  background: var(--primary-color);
+  color: white;
+}
+
 /* ================================================
    HERO / BANNER SECTION
    ================================================ */
@@ -399,6 +419,16 @@ body {
   display: flex;
   gap: 8px;
   z-index: 20;
+}
+
+.hero-nav-dots {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hero-recommended-text {
+  display: none;
 }
 
 .hero-dot {
@@ -1271,6 +1301,11 @@ body {
     display: none;
   }
   
+  /* Show mobile categories button */
+  .mobile-categories-btn {
+    display: flex;
+  }
+  
   .hero-slider {
     height: 55vh;
     min-height: 350px;
@@ -1285,21 +1320,23 @@ body {
     max-width: 100%;
   }
   
+  /* Smaller text for banner in mobile */
   .hero-title {
-    font-size: 1.5rem;
-    margin-bottom: 8px;
+    font-size: 1.3rem;
+    margin-bottom: 6px;
   }
   
   .hero-meta {
-    font-size: 11px;
-    gap: 8px;
+    font-size: 10px;
+    gap: 6px;
     flex-wrap: wrap;
+    margin-bottom: 4px;
   }
   
   .hero-description {
-    font-size: 12px;
+    font-size: 11px;
     -webkit-line-clamp: 2;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
   }
   
   .hero-buttons {
@@ -1317,8 +1354,25 @@ body {
     display: none;
   }
   
+  /* Hero navigation with recommended text */
   .hero-nav {
     bottom: 5%;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .hero-nav-dots {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .hero-recommended-text {
+    display: block;
+    font-size: 11px;
+    color: rgba(255,255,255,0.7);
+    text-align: center;
+    font-weight: 500;
   }
   
   .hero-dot {
@@ -1529,6 +1583,14 @@ body {
     font-size: 18px;
   }
   
+  /* Mobile categories button */
+  .mobile-categories-btn {
+    display: flex;
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+  
   .user-avatar {
     width: 28px;
     height: 28px;
@@ -1546,17 +1608,24 @@ body {
     min-height: 280px;
   }
   
+  /* Smaller text for banner in mobile */
   .hero-title {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
   }
   
   .hero-meta {
-    font-size: 10px;
+    font-size: 9px;
+    gap: 4px;
   }
   
   .hero-description {
-    font-size: 11px;
+    font-size: 10px;
     -webkit-line-clamp: 1;
+  }
+  
+  /* Hero recommended text */
+  .hero-recommended-text {
+    font-size: 10px;
   }
   
   .hero-buttons {

@@ -9,7 +9,10 @@
         <!-- Slides will be loaded dynamically -->
     </div>
     <div class="hero-nav" id="heroNav">
-        <!-- Dots will be generated dynamically -->
+        <span class="hero-recommended-text">Recommended Movies</span>
+        <div class="hero-nav-dots">
+            <!-- Dots will be generated dynamically -->
+        </div>
     </div>
 </div>
 
@@ -269,9 +272,10 @@
     function displayHeroSlides() {
         const slidesContainer = document.getElementById('heroSlides');
         const navContainer = document.getElementById('heroNav');
+        const dotsContainer = navContainer.querySelector('.hero-nav-dots');
         
         slidesContainer.innerHTML = '';
-        navContainer.innerHTML = '';
+        dotsContainer.innerHTML = '';
         
         heroItems.forEach((item, index) => {
             const slide = document.createElement('div');
@@ -297,7 +301,7 @@
             const dot = document.createElement('button');
             dot.className = `hero-dot ${index === 0 ? 'active' : ''}`;
             dot.onclick = (e) => { e.stopPropagation(); goToSlide(index); };
-            navContainer.appendChild(dot);
+            dotsContainer.appendChild(dot);
         });
     }
 
